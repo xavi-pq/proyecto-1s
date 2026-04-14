@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Modal, Form, Button, Row, Col, InputGroup } from "react-bootstrap";
 
 const ModalRegistroProducto = ({
@@ -42,8 +42,8 @@ const ModalRegistroProducto = ({
                 <Form.Label>Nombre del Producto</Form.Label>
                 <Form.Control
                   type="text"
-                  name="nombre_producto"
-                  value={nuevoProducto.nombre_producto}
+                  name="nombre"
+                  value={nuevoProducto.nombre}
                   onChange={manejoCambioInput}
                   placeholder="Ej: Laptop Pro 16"
                   required
@@ -55,8 +55,8 @@ const ModalRegistroProducto = ({
               <Form.Group className="mb-4">
                 <Form.Label>Categoría</Form.Label>
                 <Form.Select
-                  name="id_categoria"
-                  value={nuevoProducto.id_categoria}
+                  name="categoria_id"
+                  value={nuevoProducto.categoria_id}
                   onChange={manejoCambioInput}
                   required
                 >
@@ -92,9 +92,9 @@ const ModalRegistroProducto = ({
                   <Form.Control
                     type="number"
                     step="0.01"
-                    name="precio_producto"
+                    name="precio"
                     className="border-start-0"
-                    value={nuevoProducto.precio_producto}
+                    value={nuevoProducto.precio}
                     onChange={manejoCambioInput}
                     placeholder="0.00"
                     required
@@ -107,21 +107,21 @@ const ModalRegistroProducto = ({
                 <Form.Label>Stock Inicial</Form.Label>
                 <Form.Control
                   type="number"
-                  name="stock_producto"
-                  value={nuevoProducto.stock_producto}
+                  name="stock"
+                  value={nuevoProducto.stock}
                   onChange={manejoCambioInput}
-                  placeholder="0"
+                  placeholder="Cantidad en almacén"
                   required
                 />
               </Form.Group>
             </Col>
             <Col md={4}>
               <Form.Group className="mb-4">
-                <Form.Label>URL Imagen</Form.Label>
+                <Form.Label>URL de Imagen</Form.Label>
                 <Form.Control
-                  type="url"
-                  name="imagen_url"
-                  value={nuevoProducto.imagen_url}
+                  type="text"
+                  name="imagen__url"
+                  value={nuevoProducto.imagen__url}
                   onChange={manejoCambioInput}
                   placeholder="https://ejemplo.com/imagen.jpg"
                 />
@@ -130,20 +130,13 @@ const ModalRegistroProducto = ({
           </Row>
 
           <div className="d-flex justify-content-end gap-2 mt-2">
-            <Button variant="secondary" onClick={() => setMostrarModal(false)}>
+            <Button variant="light" onClick={() => setMostrarModal(false)} className="fw-semibold px-4">
               Cancelar
             </Button>
-            <Button
-              variant="primary"
-              type="submit"
-              disabled={deshabilitado}
-            >
+            <Button variant="primary" type="submit" disabled={deshabilitado} className="fw-semibold px-4">
               {deshabilitado ? (
-                <>
-                  <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true"></span>
-                  Guardando...
-                </>
-              ) : "Guardar Producto"}
+                <><span className="spinner-border spinner-border-sm me-2"></span>Registrando...</>
+              ) : "Registrar Producto"}
             </Button>
           </div>
         </Form>

@@ -17,7 +17,7 @@ const Catalogo = () => {
       const { data, error } = await supabase
         .from("productos")
         .select("*, categorias(nombre_categoria)")
-        .order("creado_el", { ascending: false });
+        .order("id_producto", { ascending: false });
 
       if (error) throw error;
       setProductos(data || []);
@@ -29,13 +29,13 @@ const Catalogo = () => {
   };
 
   const productosFiltrados = productos.filter(p => 
-    p.nombre_producto.toLowerCase().includes(busqueda.toLowerCase()) ||
+    p.nombre.toLowerCase().includes(busqueda.toLowerCase()) ||
     p.categorias?.nombre_categoria.toLowerCase().includes(busqueda.toLowerCase())
   );
 
   return (
-    <div className="animate-fade-in">
-      <div className="bg-primary bg-gradient text-white py-5 mb-5 shadow-sm rounded-bottom-5">
+    <div className="animate-fade-in margen-superior-main">
+      <div className="hero-section text-white py-5 mb-5 rounded-bottom-5 shadow-lg mx-3">
         <Container className="py-4 text-center">
           <Badge bg="white" className="text-primary rounded-pill px-3 py-2 mb-3 fw-bold shadow-sm">
             Catálogo Público
@@ -92,26 +92,26 @@ const Catalogo = () => {
                   <div className="position-relative" style={{ height: "220px" }}>
                     <Card.Img
                       variant="top"
-                      src={prod.imagen_url || "https://placehold.co/600x400?text=Producto"}
+                      src={prod.imagen__url || "https://placehold.co/600x400?text=Producto"}
                       className="h-100 w-100 object-fit-cover"
                     />
                     <Badge bg="primary" className="position-absolute top-0 end-0 m-3 shadow-sm rounded-pill px-3 py-2">
-                      ${prod.precio_producto.toFixed(2)}
+                      ${prod.precio.toFixed(2)}
                     </Badge>
                   </div>
                   <Card.Body className="p-4">
                     <div className="mb-2 text-primary small fw-bold text-uppercase tracking-wider">
                       {prod.categorias?.nombre_categoria || "General"}
                     </div>
-                    <h5 className="card-title fw-bold text-dark mb-2">{prod.nombre_producto}</h5>
+                    <h5 className="card-title fw-bold text-dark mb-2">{prod.nombre}</h5>
                     <p className="card-text text-muted small line-clamp-3 mb-0">
                       {prod.descripcion_producto || "Sin descripción."}
                     </p>
                   </Card.Body>
                   <Card.Footer className="bg-transparent border-0 p-4 pt-0">
                     <div className="d-flex align-items-center text-muted small fw-bold">
-                      <i className={`bi bi-circle-fill me-2 ${prod.stock_producto > 0 ? 'text-success' : 'text-danger'}`}></i>
-                      {prod.stock_producto > 0 ? 'Disponible' : 'Agotado'}
+                      <i className={`bi bi-circle-fill me-2 ${prod.stock > 0 ? 'text-success' : 'text-danger'}`}></i>
+                      {prod.stock > 0 ? 'Disponible' : 'Agotado'}
                     </div>
                   </Card.Footer>
                 </Card>

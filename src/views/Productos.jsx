@@ -3,6 +3,8 @@ import { useLocation } from "react-router-dom";
 import { Container, Row, Col, Button, Card, Spinner, Alert, Badge, Modal } from "react-bootstrap";
 import { supabase } from "../database/supabaseconfig";
 import ModalRegistroProducto from "../components/productos/ModalRegistroProducto";
+import ModalEdicionProducto from "../components/productos/ModalEdicionProducto";
+import ModalEliminacionProducto from "../components/productos/ModalEliminacionProducto";
 import NotificacionOperacion from "../components/NotificacionOperacion";
 
 const Productos = () => {
@@ -14,17 +16,22 @@ const Productos = () => {
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
   const [toast, setToast] = useState({ mostrar: false, mensaje: "", tipo: "" });
-  const [mostrarModal, setMostrarModal] = useState(false);
+  
+  // Modales
+  const [mostrarModalRegistro, setMostrarModalRegistro] = useState(false);
+  const [mostrarModalEdicion, setMostrarModalEdicion] = useState(false);
+  const [mostrarModalEliminacion, setMostrarModalEliminacion] = useState(false);
   const [mostrarDetalles, setMostrarDetalles] = useState(false);
+  
   const [productoSeleccionado, setProductoSeleccionado] = useState(null);
 
   const [nuevoProducto, setNuevoProducto] = useState({
-    nombre_producto: "",
+    nombre: "",
     descripcion_producto: "",
-    precio_producto: "",
-    stock_producto: "",
-    id_categoria: "",
-    imagen_url: "",
+    precio: "",
+    stock: "",
+    categoria_id: "",
+    imagen__url: "",
   });
 
   useEffect(() => {
@@ -33,7 +40,7 @@ const Productos = () => {
 
   useEffect(() => {
     if (filtroCategoria) {
-      setProductosFiltrados(productos.filter(p => p.id_categoria === filtroCategoria));
+      setProductosFiltrados(productos.filter(p => p.categoria_id === filtroCategoria));
     } else {
       setProductosFiltrados(productos);
     }
@@ -50,7 +57,7 @@ const Productos = () => {
       const { data, error } = await supabase
         .from("productos")
         .select("*, categorias(nombre_categoria)")
-        .order("creado_el", { ascending: false });
+        .order("id_producto", { ascending: false });
 
       if (error) throw error;
       setProductos(data || []);
@@ -77,45 +84,103 @@ const Productos = () => {
 
   const agregarProducto = async () => {
     try {
+      // 1. Obtener el ID más alto actual para productos
+      const { data: maxIdData, error: maxIdError } = await supabase
+        .from("productos")
+        .select("id_producto")
+        .order("id_producto", { ascending: false })
+        .limit(1);
+
+      if (maxIdError) throw maxIdError;
+
+      const siguienteId = maxIdData && maxIdData.length > 0 
+        ? parseInt(maxIdData[0].id_producto) + 1 
+        : 1;
+
+      console.log("Generando ID manual para producto:", siguienteId);
+
+      // 2. Insertar con el ID generado manualmente
       const { error } = await supabase.from("productos").insert([
         {
-          nombre_producto: nuevoProducto.nombre_producto,
+          id_producto: siguienteId,
+          nombre: nuevoProducto.nombre,
           descripcion_producto: nuevoProducto.descripcion_producto,
-          precio_producto: parseFloat(nuevoProducto.precio_producto),
-          stock_producto: parseInt(nuevoProducto.stock_producto),
-          id_categoria: nuevoProducto.id_categoria,
-          imagen_url: nuevoProducto.imagen_url,
+          precio: parseFloat(nuevoProducto.precio),
+          stock: parseInt(nuevoProducto.stock),
+          categoria_id: nuevoProducto.categoria_id,
+          imagen__url: nuevoProducto.imagen__url,
         },
       ]);
 
       if (error) throw error;
 
-      // 1. Mostrar notificación PRIMERO
       setToast({
         mostrar: true,
-        mensaje: `Producto "${nuevoProducto.nombre_producto}" registrado correctamente.`,
+        mensaje: `Producto "${nuevoProducto.nombre}" registrado correctamente.`,
         tipo: "exito",
       });
 
-      // 2. Limpiar formulario
       setNuevoProducto({
-        nombre_producto: "",
+        nombre: "",
         descripcion_producto: "",
-        precio_producto: "",
-        stock_producto: "",
-        id_categoria: "",
-        imagen_url: "",
+        precio: "",
+        stock: "",
+        categoria_id: "",
+        imagen__url: "",
       });
 
-      // 3. Cerrar el modal MANUALMENTE
-      setMostrarModal(false);
-
-      // 4. Refrescar datos
+      setMostrarModalRegistro(false);
       obtenerProductos();
     } catch (err) {
-      console.error("Error al agregar producto:", err.message);
-      setToast({ mostrar: true, mensaje: "Error al registrar el producto.", tipo: "error" });
+      console.error("Error al agregar:", err.message);
+      setToast({ mostrar: true, mensaje: `Error: ${err.message}`, tipo: "error" });
     }
+  };
+
+  const editarProducto = async (id, datos) => {
+    try {
+      const { error } = await supabase
+        .from("productos")
+        .update(datos)
+        .eq("id_producto", id);
+
+      if (error) throw error;
+
+      setMostrarModalEdicion(false);
+      setToast({ mostrar: true, mensaje: "Producto actualizado correctamente.", tipo: "exito" });
+      obtenerProductos();
+    } catch (err) {
+      console.error("Error al editar:", err.message);
+      setToast({ mostrar: true, mensaje: "Error al actualizar producto.", tipo: "error" });
+    }
+  };
+
+  const eliminarProducto = async (id) => {
+    try {
+      const { error } = await supabase
+        .from("productos")
+        .delete()
+        .eq("id_producto", id);
+
+      if (error) throw error;
+
+      setMostrarModalEliminacion(false);
+      setToast({ mostrar: true, mensaje: "Producto eliminado exitosamente.", tipo: "exito" });
+      obtenerProductos();
+    } catch (err) {
+      console.error("Error al eliminar:", err.message);
+      setToast({ mostrar: true, mensaje: "Error al eliminar producto.", tipo: "error" });
+    }
+  };
+
+  const abrirModalEdicion = (prod) => {
+    setProductoSeleccionado(prod);
+    setMostrarModalEdicion(true);
+  };
+
+  const abrirModalEliminacion = (prod) => {
+    setProductoSeleccionado(prod);
+    setMostrarModalEliminacion(true);
   };
 
   const verDetalles = (producto) => {
@@ -124,108 +189,110 @@ const Productos = () => {
   };
 
   return (
-    <div className="animate-fade-in">
-      {/* Hero Section for Productos */}
-      <div className="bg-primary bg-gradient text-white py-5 mb-5 shadow-sm rounded-bottom-5 position-relative">
-        <Container className="py-4">
-          <Row className="align-items-center">
-            <Col md={8} className="animate-fade-in-up">
-              <Badge bg="white" className="text-primary rounded-pill px-3 py-2 mb-3 fw-bold shadow-sm">
-                Control de Inventario
-              </Badge>
-              <h1 className="display-4 fw-bold mb-2">Gestión de <span className="text-info">Productos</span></h1>
-              <p className="lead opacity-75 mb-0">
-                Administra tu catálogo de productos con precisión y facilidad.
-              </p>
+    <div className="animate-fade-in pb-5 margen-superior-main">
+      <div className="bg-primary bg-gradient text-white py-4 mb-4 shadow-sm rounded-4 mx-2 mx-md-3 mt-3">
+        <Container>
+          <Row className="align-items-center g-3">
+            <Col md={8}>
+              <h2 className="fw-bold mb-0">
+                <i className="bi-box-seam me-2"></i>Gestión de Productos
+              </h2>
+              <p className="text-white-50 mb-0 d-none d-md-block">Administra el inventario de tu negocio.</p>
             </Col>
-            <Col md={4} className="text-end d-none d-md-block animate-fade-in-up delay-1">
+            <Col md={4} className="text-md-end">
               <Button
-                variant="info"
-                onClick={() => setMostrarModal(true)}
-                className="btn-rounded text-white shadow-lg px-4 py-2 h5 mb-0"
+                variant="light"
+                onClick={() => setMostrarModalRegistro(true)}
+                className="fw-bold text-primary px-4 py-2 w-100 w-md-auto shadow-sm btn-rounded"
               >
-                <i className="bi-plus-lg me-2"></i> Nuevo Producto
+                <i className="bi-plus-lg me-2"></i>Nuevo Producto
               </Button>
             </Col>
           </Row>
         </Container>
       </div>
 
-      <Container className="mb-5">
-        {/* Floating action button for mobile */}
-        <div className="d-md-none text-center mb-4">
-          <Button
-            variant="primary"
-            onClick={() => setMostrarModal(true)}
-            className="btn-rounded shadow px-4"
-          >
-            <i className="bi-plus-lg me-2"></i> Nuevo Producto
-          </Button>
-        </div>
-
+      <Container>
         {filtroCategoria && (
-          <Alert variant="info" className="d-flex justify-content-between align-items-center rounded-4 mb-4 animate-fade-in border-0 shadow-sm bg-primary bg-opacity-10 text-primary">
-            <span className="fw-medium">
+          <Alert variant="info" className="d-flex justify-content-between align-items-center rounded-4 mb-4 border-0 shadow-sm bg-primary bg-opacity-10 text-primary">
+            <span>
               <i className="bi-funnel-fill me-2"></i>
-              Mostrando: <strong>{categorias.find(c => c.id_categoria === filtroCategoria)?.nombre_categoria}</strong>
+              Filtrado por: <strong>{categorias.find(c => c.id_categoria === filtroCategoria)?.nombre_categoria}</strong>
             </span>
-            <Button variant="primary" size="sm" className="btn-rounded px-3 shadow-sm" onClick={() => setFiltroCategoria(null)}>
+            <Button variant="primary" size="sm" className="rounded-pill px-3" onClick={() => setFiltroCategoria(null)}>
               Ver todos
             </Button>
           </Alert>
         )}
 
         {cargando ? (
-          <div className="text-center py-5 animate-fade-in">
-            <Spinner animation="grow" variant="primary" />
-            <p className="mt-3 text-muted fw-medium">Sincronizando inventario...</p>
+          <div className="text-center py-5">
+            <Spinner animation="border" variant="primary" />
+            <p className="mt-3 text-muted">Sincronizando inventario...</p>
           </div>
         ) : error ? (
-          <Alert variant="danger" className="text-center rounded-4 animate-fade-in-up shadow-sm">
+          <Alert variant="danger" className="text-center rounded-4 shadow-sm">
             <i className="bi-exclamation-triangle-fill me-2"></i> {error}
           </Alert>
         ) : productosFiltrados.length === 0 ? (
-          <Card className="text-center border-0 bg-light py-5 shadow-sm rounded-4 animate-fade-in-up">
+          <Card className="text-center border-0 bg-light py-5 shadow-sm rounded-4">
             <Card.Body>
               <i className="bi-box text-muted display-1 mb-3"></i>
-              <h4 className="text-muted fw-bold">No hay productos en esta selección</h4>
+              <h4 className="text-muted fw-bold">No hay productos</h4>
               <p className="text-muted mb-4">Comienza agregando productos para gestionar tu catálogo.</p>
-              <Button variant="primary" className="btn-rounded" onClick={() => setMostrarModal(true)}>
-                Agregar mi primer producto
+              <Button variant="primary" onClick={() => setMostrarModalRegistro(true)}>
+                Agregar producto
               </Button>
             </Card.Body>
           </Card>
         ) : (
           <Row xs={1} sm={2} lg={3} xl={4} className="g-4">
-            {productosFiltrados.map((prod, index) => (
-              <Col key={prod.id_producto} className={`animate-fade-in-up delay-${(index % 3) + 1}`}>
-                <Card className="h-100 border-0 shadow-sm hover-lift rounded-4 overflow-hidden glass-card">
-                  <div className="position-relative overflow-hidden" style={{ height: "200px" }}>
+            {productosFiltrados.map((prod) => (
+              <Col key={prod.id_producto}>
+                <Card className="h-100 border-0 shadow-sm hover-lift rounded-4 overflow-hidden position-relative">
+                  <div style={{ height: "180px" }}>
                     <Card.Img
                       variant="top"
-                      src={prod.imagen_url || "https://placehold.co/600x400?text=Sin+Imagen"}
-                      className="h-100 w-100 object-fit-cover transition-all"
+                      src={prod.imagen__url || "https://placehold.co/600x400?text=Sin+Imagen"}
+                      className="h-100 w-100 object-fit-cover"
                     />
-                    <Badge bg="primary" className="position-absolute top-0 end-0 m-3 shadow-sm rounded-pill px-3 py-2">
-                      ${prod.precio_producto.toFixed(2)}
-                    </Badge>
                   </div>
-                  <Card.Body className="p-4">
-                    <div className="mb-2 text-primary small fw-bold text-uppercase tracking-wider">
+                  
+                  {/* Botones de acción flotantes */}
+                  <div className="position-absolute top-0 end-0 p-2 d-flex flex-column gap-2">
+                    <Button 
+                      variant="white" 
+                      size="sm" 
+                      className="rounded-circle shadow-sm border-0 p-2 bg-white text-warning"
+                      onClick={() => abrirModalEdicion(prod)}
+                    >
+                      <i className="bi-pencil-fill"></i>
+                    </Button>
+                    <Button 
+                      variant="white" 
+                      size="sm" 
+                      className="rounded-circle shadow-sm border-0 p-2 bg-white text-danger"
+                      onClick={() => abrirModalEliminacion(prod)}
+                    >
+                      <i className="bi-trash-fill"></i>
+                    </Button>
+                  </div>
+
+                  <Card.Body className="p-3">
+                    <div className="text-primary small fw-bold text-uppercase mb-1">
                       {prod.categorias?.nombre_categoria || "General"}
                     </div>
-                    <h5 className="card-title fw-bold text-dark mb-2 text-truncate">{prod.nombre_producto}</h5>
-                    <p className="card-text text-muted small line-clamp-3 mb-0" style={{ minHeight: "3.6em" }}>
-                      {prod.descripcion_producto || "Sin descripción disponible."}
-                    </p>
-                  </Card.Body>
-                  <Card.Footer className="bg-transparent border-0 p-4 pt-0 d-flex justify-content-between align-items-center">
-                    <div className="d-flex align-items-center">
-                      <i className={`bi-circle-fill me-2 small ${prod.stock_producto > 5 ? "text-success" : "text-danger"}`}></i>
-                      <span className="small fw-bold text-muted">{prod.stock_producto} en stock</span>
+                    <h6 className="fw-bold text-dark text-truncate mb-2">{prod.nombre}</h6>
+                    <div className="d-flex justify-content-between align-items-center">
+                      <span className="h5 fw-bold text-primary mb-0">${prod.precio.toFixed(2)}</span>
+                      <Badge bg={prod.stock > 5 ? "success" : "danger"} pill>
+                        {prod.stock} uds
+                      </Badge>
                     </div>
-                    <Button variant="outline-primary" size="sm" className="btn-rounded px-3" onClick={() => verDetalles(prod)}>
-                      Detalles
+                  </Card.Body>
+                  <Card.Footer className="bg-transparent border-0 p-3 pt-0">
+                    <Button variant="outline-primary" size="sm" className="w-100 rounded-pill" onClick={() => verDetalles(prod)}>
+                      Ver detalles
                     </Button>
                   </Card.Footer>
                 </Card>
@@ -235,75 +302,74 @@ const Productos = () => {
         )}
 
         <ModalRegistroProducto
-          mostrarModal={mostrarModal}
-          setMostrarModal={setMostrarModal}
+          mostrarModal={mostrarModalRegistro}
+          setMostrarModal={setMostrarModalRegistro}
           categorias={categorias}
           nuevoProducto={nuevoProducto}
           manejoCambioInput={manejoCambioInput}
           agregarProducto={agregarProducto}
         />
 
+        <ModalEdicionProducto
+          mostrar={mostrarModalEdicion}
+          onHide={() => setMostrarModalEdicion(false)}
+          producto={productoSeleccionado}
+          categorias={categorias}
+          onGuardar={editarProducto}
+        />
+
+        <ModalEliminacionProducto
+          mostrar={mostrarModalEliminacion}
+          onHide={() => setMostrarModalEliminacion(false)}
+          producto={productoSeleccionado}
+          onConfirmar={eliminarProducto}
+        />
+
         {/* Modal de Detalles */}
-        <Modal 
-          show={mostrarDetalles} 
-          onHide={() => setMostrarDetalles(false)} 
-          centered 
-          size="md"
-          contentClassName="modal-content-custom"
-        >
-          <Modal.Header closeButton className="modal-header-custom">
-            <Modal.Title>
-              <i className="bi-info-circle-fill me-2 text-primary"></i> Detalles del Producto
-            </Modal.Title>
+        <Modal show={mostrarDetalles} onHide={() => setMostrarDetalles(false)} centered>
+          <Modal.Header closeButton className="border-0">
+            <Modal.Title className="fw-bold">Detalles del Producto</Modal.Title>
           </Modal.Header>
-          <Modal.Body className="modal-body-custom text-center">
+          <Modal.Body className="text-center pb-4">
             {productoSeleccionado && (
-              <div className="animate-fade-in">
-                <div className="position-relative mb-4 overflow-hidden rounded-4 shadow-sm" style={{ height: '250px' }}>
+              <>
+                <div className="rounded-4 overflow-hidden mb-4 shadow-sm" style={{ height: '200px' }}>
                   <img 
-                    src={productoSeleccionado.imagen_url || "https://placehold.co/600x400?text=Sin+Imagen"} 
-                    alt={productoSeleccionado.nombre_producto}
-                    className="h-100 w-100 object-fit-cover hover-lift transition-all"
+                    src={productoSeleccionado.imagen__url || "https://placehold.co/600x400?text=Sin+Imagen"} 
+                    className="h-100 w-100 object-fit-cover"
+                    alt=""
                   />
-                  <Badge bg="primary" className="position-absolute top-0 end-0 m-3 shadow-sm rounded-pill px-3 py-2">
-                    ${productoSeleccionado.precio_producto.toFixed(2)}
-                  </Badge>
                 </div>
-                
-                <div className="mb-2 text-primary small fw-bold text-uppercase tracking-wider">
-                  {productoSeleccionado.categorias?.nombre_categoria || "General"}
-                </div>
-                <h3 className="fw-bold text-dark mb-3">{productoSeleccionado.nombre_producto}</h3>
+                <h4 className="fw-bold text-dark mb-1">{productoSeleccionado.nombre}</h4>
+                <p className="text-primary fw-bold mb-3">{productoSeleccionado.categorias?.nombre_categoria || "General"}</p>
                 
                 <Row className="g-3 mb-4">
                   <Col xs={6}>
-                    <div className="p-3 bg-light rounded-4 border border-white shadow-sm h-100">
-                      <div className="small text-muted text-uppercase fw-bold mb-1">Precio Unitario</div>
-                      <div className="h4 fw-bold text-primary mb-0">${productoSeleccionado.precio_producto.toFixed(2)}</div>
+                    <div className="p-2 bg-light rounded-3">
+                      <div className="small text-muted mb-1">Precio</div>
+                      <div className="fw-bold text-dark">${productoSeleccionado.precio.toFixed(2)}</div>
                     </div>
                   </Col>
                   <Col xs={6}>
-                    <div className={`p-3 rounded-4 border border-white shadow-sm h-100 ${productoSeleccionado.stock_producto > 5 ? 'bg-success bg-opacity-10' : 'bg-danger bg-opacity-10'}`}>
-                      <div className="small text-muted text-uppercase fw-bold mb-1">Stock Disponible</div>
-                      <div className={`h4 fw-bold mb-0 ${productoSeleccionado.stock_producto > 5 ? 'text-success' : 'text-danger'}`}>
-                        {productoSeleccionado.stock_producto} <small className="h6">uds</small>
-                      </div>
+                    <div className="p-2 bg-light rounded-3">
+                      <div className="small text-muted mb-1">Stock</div>
+                      <div className="fw-bold text-dark">{productoSeleccionado.stock} unidades</div>
                     </div>
                   </Col>
                 </Row>
                 
                 <div className="text-start">
-                  <div className="small text-muted text-uppercase fw-bold mb-2 ps-1">Descripción del Producto</div>
-                  <div className="p-3 bg-white border rounded-4 text-muted small shadow-inner" style={{ minHeight: '80px', background: 'linear-gradient(to bottom, #ffffff, #f9fafb)' }}>
-                    {productoSeleccionado.descripcion_producto || "Sin descripción adicional disponible para este producto."}
+                  <div className="small text-muted fw-bold text-uppercase mb-2">Descripción</div>
+                  <div className="p-3 bg-light rounded-3 small text-muted">
+                    {productoSeleccionado.descripcion_producto || "Sin descripción disponible."}
                   </div>
                 </div>
-              </div>
+              </>
             )}
           </Modal.Body>
-          <Modal.Footer className="modal-footer-custom">
-            <Button variant="primary" className="w-100 py-2 fw-bold" onClick={() => setMostrarDetalles(false)}>
-              Entendido
+          <Modal.Footer className="border-0">
+            <Button variant="primary" className="w-100 rounded-pill" onClick={() => setMostrarDetalles(false)}>
+              Cerrar
             </Button>
           </Modal.Footer>
         </Modal>
