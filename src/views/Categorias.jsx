@@ -6,6 +6,7 @@ import ModalRegistroCategoria from "../components/categorias/ModalRegistroCatego
 import ModalEdicionCategoria from "../components/categorias/ModalEdicionCategoria";
 import ModalEliminacionCategoria from "../components/categorias/ModalEliminacionCategoria";
 import TablaCategorias from "../components/categorias/TablaCategorias";
+import TarjetaCategoria from "../components/categorias/TarjetaCategoria";
 import NotificacionOperacion from "../components/NotificacionOperacion";
 
 const Categorias = () => {
@@ -209,43 +210,14 @@ const Categorias = () => {
 
             {/* Vista de Tarjetas para Móvil/Híbrido */}
             <div className="d-lg-none">
-              <Row className="g-3">
-                {categorias.map((cat) => (
-                  <Col xs={12} key={cat.id_categoria}>
-                    <Card className="border-0 shadow-sm rounded-4 hover-lift">
-                      <Card.Body className="p-3">
-                        <div className="d-flex justify-content-between align-items-start mb-2">
-                          <div className="bg-primary bg-opacity-10 p-2 rounded-3 me-3">
-                            <i className="bi-tag-fill text-primary h5 mb-0"></i>
-                          </div>
-                          <div className="d-flex gap-2">
-                            <Button 
-                              variant="light" 
-                              size="sm" 
-                              className="text-warning rounded-circle p-2 shadow-sm border-0"
-                              onClick={() => abrirModalEdicion(cat)}
-                            >
-                              <i className="bi-pencil-fill"></i>
-                            </Button>
-                            <Button 
-                              variant="light" 
-                              size="sm" 
-                              className="text-danger rounded-circle p-2 shadow-sm border-0"
-                              onClick={() => abrirModalEliminacion(cat)}
-                            >
-                              <i className="bi-trash-fill"></i>
-                            </Button>
-                          </div>
-                        </div>
-                        <h5 className="fw-bold text-dark mb-1">{cat.nombre_categoria}</h5>
-                        <p className="text-muted small mb-0">{cat.descripcion_categoria || "Sin descripción"}</p>
-                        <div className="mt-2 text-end">
-                          <Badge bg="light" className="text-muted fw-normal border">ID: {cat.id_categoria}</Badge>
-                        </div>
-                      </Card.Body>
-                    </Card>
-                  </Col>
-                ))}
+              <Row>
+                <Col xs={12} sm={12} md={12} className="d-lg-none">
+                  <TarjetaCategoria
+                    categorias={categorias}
+                    abrirModalEdicion={abrirModalEdicion}
+                    abrirModalEliminacion={abrirModalEliminacion}
+                  />
+                </Col>
               </Row>
             </div>
           </>
