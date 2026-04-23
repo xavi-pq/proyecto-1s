@@ -8,6 +8,7 @@ import ModalEliminacionCategoria from "../components/categorias/ModalEliminacion
 import TablaCategorias from "../components/categorias/TablaCategorias";
 import TarjetaCategoria from "../components/categorias/TarjetaCategoria";
 import NotificacionOperacion from "../components/NotificacionOperacion";
+import Paginacion from "../components/Paginacion";
 
 const Categorias = () => {
   const navigate = useNavigate();
@@ -17,6 +18,10 @@ const Categorias = () => {
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
   const [toast, setToast] = useState({ mostrar: false, mensaje: "", tipo: "" });
+
+  // Paginación
+  const [paginaActual, setPaginaActual] = useState(1);
+  const [itemsPorPagina, setItemsPorPagina] = useState(5);
 
   // Modales
   const [mostrarModalRegistro, setMostrarModalRegistro] = useState(false);
@@ -36,20 +41,25 @@ const Categorias = () => {
   }, []);
 
   useEffect(() => {
-    if (busqueda.trim() === "") {
-      setCategoriasFiltradas(categorias);
-    } else {
+    let filtradas = categorias;
+    if (busqueda.trim() !== "") {
       const termino = busqueda.toLowerCase();
-      const filtradas = categorias.filter(
+      filtradas = categorias.filter(
         (cat) =>
           cat.nombre_categoria.toLowerCase().includes(termino) ||
           (cat.descripcion_categoria &&
             cat.descripcion_categoria.toLowerCase().includes(termino)) ||
           cat.id_categoria.toString().includes(termino)
       );
-      setCategoriasFiltradas(filtradas);
     }
+    setCategoriasFiltradas(filtradas);
+    setPaginaActual(1); // Resetear a la primera página al buscar
   }, [busqueda, categorias]);
+
+  // Obtener categorías para la página actual
+  const indiceUltimoItem = paginaActual * itemsPorPagina;
+  const indicePrimerItem = indiceUltimoItem - itemsPorPagina;
+  const categoriasPaginadas = categoriasFiltradas.slice(indicePrimerItem, indiceUltimoItem);
 
   const obtenerCategorias = async () => {
     try {
@@ -255,7 +265,7 @@ const Categorias = () => {
             {/* Vista de Tabla para Escritorio */}
             <div className="d-none d-lg-block">
               <TablaCategorias
-                categorias={categoriasFiltradas}
+                categorias={categoriasPaginadas}
                 abrirModalEdicion={abrirModalEdicion}
                 abrirModalEliminacion={abrirModalEliminacion}
               />
@@ -266,13 +276,22 @@ const Categorias = () => {
               <Row>
                 <Col xs={12} sm={12} md={12} className="d-lg-none">
                   <TarjetaCategoria
-                    categorias={categoriasFiltradas}
+                    categorias={categoriasPaginadas}
                     abrirModalEdicion={abrirModalEdicion}
                     abrirModalEliminacion={abrirModalEliminacion}
                   />
                 </Col>
               </Row>
             </div>
+
+            {/* Componente de Paginación */}
+            <Paginacion 
+              paginaActual={paginaActual}
+              totalItems={categoriasFiltradas.length}
+              itemsPorPagina={itemsPorPagina}
+              onCambioPagina={setPaginaActual}
+              onCambioItemsPorPagina={setItemsPorPagina}
+            />
           </>
         )}
 

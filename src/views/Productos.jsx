@@ -16,7 +16,7 @@ const Productos = () => {
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
   const [toast, setToast] = useState({ mostrar: false, mensaje: "", tipo: "" });
-  
+
   // Modales
   const [mostrarModalRegistro, setMostrarModalRegistro] = useState(false);
   const [mostrarModalEdicion, setMostrarModalEdicion] = useState(false);
