@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { Container, Row, Col, Button, Spinner, Alert, Badge, Card } from "react-bootstrap";
+import { Container, Row, Col, Button, Spinner, Alert, Badge, Card, Form, InputGroup } from "react-bootstrap";
 import { supabase } from "../database/supabaseconfig";
 import ModalRegistroCategoria from "../components/categorias/ModalRegistroCategoria";
 import ModalEdicionCategoria from "../components/categorias/ModalEdicionCategoria";
@@ -12,10 +12,12 @@ import NotificacionOperacion from "../components/NotificacionOperacion";
 const Categorias = () => {
   const navigate = useNavigate();
   const [categorias, setCategorias] = useState([]);
+  const [categoriasFiltradas, setCategoriasFiltradas] = useState([]);
+  const [busqueda, setBusqueda] = useState("");
   const [cargando, setCargando] = useState(true);
   const [error, setError] = useState(null);
   const [toast, setToast] = useState({ mostrar: false, mensaje: "", tipo: "" });
-  
+
   // Modales
   const [mostrarModalRegistro, setMostrarModalRegistro] = useState(false);
   const [mostrarModalEdicion, setMostrarModalEdicion] = useState(false);
@@ -32,6 +34,22 @@ const Categorias = () => {
   useEffect(() => {
     obtenerCategorias();
   }, []);
+
+  useEffect(() => {
+    if (busqueda.trim() === "") {
+      setCategoriasFiltradas(categorias);
+    } else {
+      const termino = busqueda.toLowerCase();
+      const filtradas = categorias.filter(
+        (cat) =>
+          cat.nombre_categoria.toLowerCase().includes(termino) ||
+          (cat.descripcion_categoria &&
+            cat.descripcion_categoria.toLowerCase().includes(termino)) ||
+          cat.id_categoria.toString().includes(termino)
+      );
+      setCategoriasFiltradas(filtradas);
+    }
+  }, [busqueda, categorias]);
 
   const obtenerCategorias = async () => {
     try {
@@ -177,6 +195,34 @@ const Categorias = () => {
       </div>
 
       <Container>
+        {/* Cuadro de Búsqueda */}
+        <div className="mb-4">
+          <Row className="justify-content-start">
+            <Col md={6} lg={4}>
+              <InputGroup className="shadow-sm rounded-pill overflow-hidden border-0 bg-white p-1">
+                <InputGroup.Text className="bg-transparent border-0 ps-3">
+                  <i className="bi bi-search text-muted"></i>
+                </InputGroup.Text>
+                <Form.Control
+                  placeholder="Buscar..."
+                  className="border-0 shadow-none bg-transparent"
+                  value={busqueda}
+                  onChange={(e) => setBusqueda(e.target.value)}
+                />
+                {busqueda && (
+                  <Button 
+                    variant="link" 
+                    className="text-muted pe-3 text-decoration-none"
+                    onClick={() => setBusqueda("")}
+                  >
+                    <i className="bi bi-x-circle-fill"></i>
+                  </Button>
+                )}
+              </InputGroup>
+            </Col>
+          </Row>
+        </div>
+
         {cargando ? (
           <div className="text-center py-5">
             <Spinner animation="border" variant="primary" />
@@ -197,12 +243,19 @@ const Categorias = () => {
               </Button>
             </Card.Body>
           </Card>
+        ) : categoriasFiltradas.length === 0 ? (
+          <div className="text-center py-5 opacity-50">
+            <i className="bi bi-search display-3 mb-3 text-muted"></i>
+            <h4 className="text-muted">No se encontraron resultados</h4>
+            <p className="text-muted small">Intenta con otros términos de búsqueda.</p>
+            <Button variant="link" onClick={() => setBusqueda("")}>Limpiar búsqueda</Button>
+          </div>
         ) : (
           <>
             {/* Vista de Tabla para Escritorio */}
             <div className="d-none d-lg-block">
               <TablaCategorias
-                categorias={categorias}
+                categorias={categoriasFiltradas}
                 abrirModalEdicion={abrirModalEdicion}
                 abrirModalEliminacion={abrirModalEliminacion}
               />
@@ -213,7 +266,7 @@ const Categorias = () => {
               <Row>
                 <Col xs={12} sm={12} md={12} className="d-lg-none">
                   <TarjetaCategoria
-                    categorias={categorias}
+                    categorias={categoriasFiltradas}
                     abrirModalEdicion={abrirModalEdicion}
                     abrirModalEliminacion={abrirModalEliminacion}
                   />
