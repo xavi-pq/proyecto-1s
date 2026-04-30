@@ -1,127 +1,49 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { Modal, Form, Button, Row, Col } from "react-bootstrap";
 
 const ModalEdicionProducto = ({
-  mostrar,
-  onHide,
-  producto,
+  mostrarModalEdicion,
+  setMostrarModalEdicion,
+  productoEditar,
+  manejoCambioInputEdicion,
+  manejoCambioArchivoActualizar,
+  actualizarProducto,
   categorias,
-  onGuardar,
 }) => {
-  const [datos, setDatos] = useState({
-    nombre: "",
-    descripcion_producto: "",
-    precio: "",
-    stock: "",
-    categoria_id: "",
-    imagen__url: "",
-  });
-  const [cargando, setCargando] = useState(false);
+  const [deshabilitado, setDeshabilitado] = useState(false);
 
-  useEffect(() => {
-    if (producto) {
-      setDatos({
-        nombre: producto.nombre || "",
-        descripcion_producto: producto.descripcion_producto || "",
-        precio: producto.precio || "",
-        stock: producto.stock || "",
-        categoria_id: producto.categoria_id || "",
-        imagen__url: producto.imagen__url || "",
-      });
-    }
-  }, [producto]);
-
-  const handleChange = (e) => {
-    const { name, value } = e.target;
-    setDatos((prev) => ({ ...prev, [name]: value }));
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-    setCargando(true);
-    await onGuardar(producto.id_producto, {
-      ...datos,
-      precio: parseFloat(datos.precio),
-      stock: parseInt(datos.stock),
-    });
-    setCargando(false);
+  const handleActualizar = async () => {
+    if (deshabilitado) return;
+    setDeshabilitado(true);
+    await actualizarProducto();
+    setDeshabilitado(false);
   };
 
   return (
-    <Modal show={mostrar} onHide={onHide} centered backdrop="static" size="lg">
-      <Modal.Header closeButton className="border-0 pb-0">
-        <Modal.Title className="fw-bold">
-          <i className="bi-pencil-square text-warning me-2"></i>
-          Editar Producto
-        </Modal.Title>
+    <Modal
+      show={mostrarModalEdicion}
+      onHide={() => setMostrarModalEdicion(false)}
+      backdrop="static"
+      centered
+      size="lg"
+    >
+      <Modal.Header closeButton>
+        <Modal.Title>Editar Producto</Modal.Title>
       </Modal.Header>
-      <Form onSubmit={handleSubmit}>
-        <Modal.Body className="pt-4">
-          <Row className="g-3">
-            <Col md={12}>
+
+      <Modal.Body>
+        <Form>
+          <Row>
+            <Col xs={12} md={4}>
               <Form.Group className="mb-3">
-                <Form.Label className="fw-semibold small text-muted text-uppercase">Nombre del Producto</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="nombre"
-                  value={datos.nombre}
-                  onChange={handleChange}
-                  className="bg-light border-0 py-2"
-                  required
-                />
-              </Form.Group>
-            </Col>
-            <Col md={12}>
-              <Form.Group className="mb-3">
-                <Form.Label className="fw-semibold small text-muted text-uppercase">Descripción</Form.Label>
-                <Form.Control
-                  as="textarea"
-                  rows={2}
-                  name="descripcion_producto"
-                  value={datos.descripcion_producto}
-                  onChange={handleChange}
-                  className="bg-light border-0 py-2"
-                />
-              </Form.Group>
-            </Col>
-            <Col md={6}>
-              <Form.Group className="mb-3">
-                <Form.Label className="fw-semibold small text-muted text-uppercase">Precio</Form.Label>
-                <Form.Control
-                  type="number"
-                  step="0.01"
-                  name="precio"
-                  value={datos.precio}
-                  onChange={handleChange}
-                  className="bg-light border-0 py-2"
-                  required
-                />
-              </Form.Group>
-            </Col>
-            <Col md={6}>
-              <Form.Group className="mb-3">
-                <Form.Label className="fw-semibold small text-muted text-uppercase">Stock</Form.Label>
-                <Form.Control
-                  type="number"
-                  name="stock"
-                  value={datos.stock}
-                  onChange={handleChange}
-                  className="bg-light border-0 py-2"
-                  required
-                />
-              </Form.Group>
-            </Col>
-            <Col md={6}>
-              <Form.Group className="mb-3">
-                <Form.Label className="fw-semibold small text-muted text-uppercase">Categoría</Form.Label>
+                <Form.Label>Categoría *</Form.Label>
                 <Form.Select
                   name="categoria_id"
-                  value={datos.categoria_id}
-                  onChange={handleChange}
-                  className="bg-light border-0 py-2"
+                  value={productoEditar.categoria_id || ""}
+                  onChange={manejoCambioInputEdicion}
                   required
                 >
-                  <option value="">Selecciona una categoría</option>
+                  <option value="">Seleccione...</option>
                   {categorias.map((cat) => (
                     <option key={cat.id_categoria} value={cat.id_categoria}>
                       {cat.nombre_categoria}
@@ -130,31 +52,109 @@ const ModalEdicionProducto = ({
                 </Form.Select>
               </Form.Group>
             </Col>
-            <Col md={6}>
+
+            <Col xs={12} md={4}>
               <Form.Group className="mb-3">
-                <Form.Label className="fw-semibold small text-muted text-uppercase">URL de la Imagen</Form.Label>
+                <Form.Label>Nombre *</Form.Label>
                 <Form.Control
                   type="text"
-                  name="imagen__url"
-                  value={datos.imagen__url}
-                  onChange={handleChange}
-                  className="bg-light border-0 py-2"
+                  name="nombre"
+                  value={productoEditar.nombre || ""}
+                  onChange={manejoCambioInputEdicion}
+                  required
+                />
+              </Form.Group>
+            </Col>
+
+            <Col xs={12} md={3}>
+              <Form.Group className="mb-3">
+                <Form.Label>Precio de venta *</Form.Label>
+                <Form.Control
+                  type="number"
+                  step="0.01"
+                  min="0"
+                  name="precio"
+                  value={productoEditar.precio || ""}
+                  onChange={manejoCambioInputEdicion}
+                  required
+                />
+              </Form.Group>
+            </Col>
+
+            <Col xs={12} md={3}>
+              <Form.Group className="mb-3">
+                <Form.Label>Stock *</Form.Label>
+                <Form.Control
+                  type="number"
+                  min="0"
+                  name="stock"
+                  value={productoEditar.stock || ""}
+                  onChange={manejoCambioInputEdicion}
+                  required
+                />
+              </Form.Group>
+            </Col>
+
+            <Col xs={12} md={12}>
+              <Form.Group className="mb-3 text-center">
+                <Form.Label>Imagen actual</Form.Label>
+                {productoEditar.imagen__url ? (
+                  <div className="mb-2">
+                    <img
+                      src={productoEditar.imagen__url}
+                      alt="Producto actual"
+                      style={{ maxWidth: "120px", maxHeight: "120px", objectFit: "cover", borderRadius: "6px" }}
+                    />
+                  </div>
+                ) : (
+                  <p className="text-muted">Sin imagen</p>
+                )}
+              </Form.Group>
+            </Col>
+
+            <Col xs={12} md={12}>
+              <Form.Group className="mb-3">
+                <Form.Label>Nueva imagen (opcional)</Form.Label>
+                <Form.Control
+                  type="file"
+                  accept="image/*"
+                  onChange={manejoCambioArchivoActualizar}
+                />
+                <Form.Text className="text-muted">
+                  Si seleccionas una nueva imagen, reemplazará la actual
+                </Form.Text>
+              </Form.Group>
+            </Col>
+
+            <Col xs={12} md={12}>
+              <Form.Group className="mb-3">
+                <Form.Label>Descripción</Form.Label>
+                <Form.Control
+                  as="textarea"
+                  rows={5}
+                  name="descripcion_producto"
+                  value={productoEditar.descripcion_producto || ""}
+                  onChange={manejoCambioInputEdicion}
+                  placeholder="Descripción del producto (opcional)"
                 />
               </Form.Group>
             </Col>
           </Row>
-        </Modal.Body>
-        <Modal.Footer className="border-0 pt-0">
-          <Button variant="light" onClick={onHide} disabled={cargando} className="fw-semibold">
-            Cancelar
-          </Button>
-          <Button variant="warning" type="submit" disabled={cargando} className="text-white fw-semibold px-4">
-            {cargando ? (
-              <><span className="spinner-border spinner-border-sm me-2"></span>Guardando...</>
-            ) : "Actualizar Producto"}
-          </Button>
-        </Modal.Footer>
-      </Form>
+        </Form>
+      </Modal.Body>
+
+      <Modal.Footer>
+        <Button variant="secondary" onClick={() => setMostrarModalEdicion(false)}>
+          Cancelar
+        </Button>
+        <Button
+          variant="primary"
+          onClick={handleActualizar}
+          disabled={deshabilitado}
+        >
+          Actualizar
+        </Button>
+      </Modal.Footer>
     </Modal>
   );
 };
