@@ -7,7 +7,7 @@ const Encabezado = () => {
   const [mostrarMenu, setMostrarMenu] = useState(false);
   const [tema, setTema] = useState(localStorage.getItem("tema") || "light");
   const navigate = useNavigate();
-  const location = useLocation();'pl,  '
+  const location = useLocation();
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", tema);

@@ -5,8 +5,8 @@ const TarjetaCatalogo = ({ producto, categoriaNombre }) => {
   const [mostrarModal, setMostrarModal] = useState(false);
 
   const descripcion = producto.descripcion_producto || "";
-  const prevVisualizacionTexto = descripcion.length > 50
-    ? descripcion.substring(0, 50) + "..."
+  const visualizacionTexto = descripcion.length > 50 
+    ? descripcion.substring(0, 50) + "..." 
     : descripcion;
   const tieneMasTexto = descripcion.length > 50;
 
@@ -19,7 +19,7 @@ const TarjetaCatalogo = ({ producto, categoriaNombre }) => {
         tabIndex={0}
         onClick={() => setMostrarModal(true)}
         onKeyDown={(e) => e.key === "Enter" && setMostrarModal(true)}
-        aria-labelledby={`producto-${producto.id_producto}-titulo`}
+        aria-labelledby={`producto-${producto.id_producto}-title`}
       >
         <Card.Img
           variant="top"
@@ -30,33 +30,32 @@ const TarjetaCatalogo = ({ producto, categoriaNombre }) => {
 
         <Card.Body className="d-flex flex-column p-3">
           <Card.Title
-            id={`producto-${producto.id_producto}-titulo`}
-            className="fw-bold text-dark mb-2"
+            id={`producto-${producto.id_producto}-title`}
+            className="h6 fw-bold text-dark mb-2"
           >
             {producto.nombre}
           </Card.Title>
 
-          <div className="flex-grow-1">
-            <p className="text-muted small flex-grow-1">
-              {prevVisualizacionTexto}
-              {tieneMasTexto && (
-                <span className="text-primary fw-medium ms-1">
-                  {" "}
-                  Ver más
-                </span>
-              )}
-            </p>
-          </div>
+          <Card.Text className="flex-grow-1 text-muted small fw-medium mb-1">
+            {visualizacionTexto}
+          </Card.Text>
+
+          {tieneMasTexto && (
+            <span className="text-primary medium ms-1">
+              <i className="bi-eye"></i> Ver más
+            </span>
+          )}
 
           <div className="mt-2">
-            <Badge bg="secondary" pill size="sm">
+            <Badge bg="primary" pill className="ms-1">
               {categoriaNombre || "Sin categoría"}
             </Badge>
           </div>
         </Card.Body>
-        <Card.Footer className="bg-white border-0 pt-0">
+
+        <Card.Footer className="bg-white pt-0 border-0">
           <div className="d-flex justify-content-between align-items-center">
-            <span className="fw-bold h4 mb-0">
+            <span className="fw-bold text-success fs-4">
               ${parseFloat(producto.precio).toFixed(2)}
             </span>
           </div>
@@ -69,52 +68,38 @@ const TarjetaCatalogo = ({ producto, categoriaNombre }) => {
         size="lg"
         centered
       >
-        <Modal.Header closeButton className="border-0 pb-1">
-          <Modal.Title className="fw-bold fs-4">
+        <Modal.Header closeButton className="border-0 pb-0">
+          <Modal.Title className="fs-4 fw-bold">
             {producto.nombre}
           </Modal.Title>
         </Modal.Header>
 
-        <Modal.Body className="pt-2">
+        <Modal.Body className="pt-3">
           <div className="row g-4">
             <div className="col-md-6">
-              <div
-                className="rounded d-flex align-items-center justify-content-center"
-                style={{ backgroundColor: "#f8f9fa", width: "100%" }}
-              >
-                {producto.imagen__url ? (
-                  <img
-                    src={producto.imagen__url}
-                    alt={producto.nombre}
-                    className="img-fluid rounded shadow"
-                    style={{ maxHeight: "400px", objectFit: "contain", width: "100%" }}
-                  />
-                ) : (
-                  <div
-                    className="bi bi-image text-muted fs-1 d-flex align-items-center justify-content-center"
-                    style={{ height: "400px" }}
-                  />
-                )}
-              </div>
+              <img
+                src={producto.imagen__url || "https://placehold.co/600x400?text=Sin+Imagen"}
+                alt={producto.nombre}
+                className="img-fluid rounded shadow-sm object-fit-cover"
+                style={{ height: "400px", width: "100%" }}
+              />
             </div>
 
-            <div className="col-md-6 d-flex flex-column gap-3">
-              <div>
-                <Badge bg="primary" pill className="fs-6">
+            <div className="col-md-6 d-flex flex-column">
+              <div className="mb-3">
+                <Badge bg="primary" pill className="mb-2">
                   {categoriaNombre || "Sin categoría"}
                 </Badge>
               </div>
 
-              <div>
-                <h4 className="text-success fw-bold mb-0">
-                  ${parseFloat(producto.precio).toFixed(2)}
-                </h4>
-              </div>
+              <h3 className="fw-bold text-dark mb-3">
+                ${parseFloat(producto.precio).toFixed(2)}
+              </h3>
 
               {descripcion && (
-                <div>
-                  <h5 className="fw-semibold mb-2 text-secondary">Descripción</h5>
-                  <p className="text-muted mb-0" style={{ lineHeight: "1.7" }}>
+                <div className="mb-2">
+                  <h6 className="fw-bold text-muted mb-1">Descripción:</h6>
+                  <p className="text-muted" style={{ lineHeight: "1.7" }}>
                     {descripcion}
                   </p>
                 </div>
