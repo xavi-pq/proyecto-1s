@@ -2,12 +2,14 @@ import React, { useState, useEffect } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Container, Nav, Navbar, Button } from "react-bootstrap";
 import { supabase } from "../../database/supabaseconfig";
+import { useAuth } from "../../context/AuthContext";
 
 const Encabezado = () => {
   const [mostrarMenu, setMostrarMenu] = useState(false);
   const [tema, setTema] = useState(localStorage.getItem("tema") || "light");
   const navigate = useNavigate();
   const location = useLocation();
+  const { tienePermiso, logout, usuario } = useAuth();
 
   useEffect(() => {
     document.documentElement.setAttribute("data-theme", tema);
@@ -26,18 +28,12 @@ const Encabezado = () => {
   };
 
   const cerrarSesion = async () => {
-    try {
-      const { error } = await supabase.auth.signOut();
-      if (error) throw error;
-      localStorage.removeItem("usuario-supabase");
-      setMostrarMenu(false);
-      navigate("/login");
-    } catch (err) {
-      console.error("Error cerrando sesión:", err.message);
-    }
+    await logout();
+    setMostrarMenu(false);
+    navigate("/login");
   };
 
-  const estaLogueado = !!localStorage.getItem("usuario-supabase");
+  const estaLogueado = !!usuario;
   const esLogin = location.pathname === "/login";
 
   return (
@@ -110,30 +106,62 @@ const Encabezado = () => {
               </>
             ) : (
               <>
-                <Nav.Link 
-                  onClick={() => manejarNavegacion("/")} 
-                  className={`nav-link-custom ${location.pathname === '/' ? 'nav-link-active' : ''}`}
-                >
-                  <i className="bi-house-fill me-2"></i> Inicio
-                </Nav.Link>
-                <Nav.Link 
-                  onClick={() => manejarNavegacion("/categorias")} 
-                  className={`nav-link-custom ${location.pathname === '/categorias' ? 'nav-link-active' : ''}`}
-                >
-                  <i className="bi-grid-fill me-2"></i> Categorías
-                </Nav.Link>
-                <Nav.Link 
-                  onClick={() => manejarNavegacion("/productos")} 
-                  className={`nav-link-custom ${location.pathname === '/productos' ? 'nav-link-active' : ''}`}
-                >
-                  <i className="bi-box-seam-fill me-2"></i> Productos
-                </Nav.Link>
-                <Nav.Link 
-                  onClick={() => manejarNavegacion("/catalogo")} 
-                  className={`nav-link-custom ${location.pathname === '/catalogo' ? 'nav-link-active' : ''}`}
-                >
-                  <i className="bi-layout-text-window-reverse me-2"></i> Catálogo
-                </Nav.Link>
+                {tienePermiso('ver_inicio') && (
+                  <Nav.Link 
+                    onClick={() => manejarNavegacion("/")} 
+                    className={`nav-link-custom ${location.pathname === '/' ? 'nav-link-active' : ''}`}
+                  >
+                    <i className="bi-house-fill me-2"></i> Inicio
+                  </Nav.Link>
+                )}
+                {tienePermiso('ver_categorias') && (
+                  <Nav.Link 
+                    onClick={() => manejarNavegacion("/categorias")} 
+                    className={`nav-link-custom ${location.pathname === '/categorias' ? 'nav-link-active' : ''}`}
+                  >
+                    <i className="bi-grid-fill me-2"></i> Categorías
+                  </Nav.Link>
+                )}
+                {tienePermiso('ver_productos') && (
+                  <Nav.Link 
+                    onClick={() => manejarNavegacion("/productos")} 
+                    className={`nav-link-custom ${location.pathname === '/productos' ? 'nav-link-active' : ''}`}
+                  >
+                    <i className="bi-box-seam-fill me-2"></i> Productos
+                  </Nav.Link>
+                )}
+                {tienePermiso('ver_empleados') && (
+                  <Nav.Link 
+                    onClick={() => manejarNavegacion("/empleados")} 
+                    className={`nav-link-custom ${location.pathname === '/empleados' ? 'nav-link-active' : ''}`}
+                  >
+                    <i className="bi-people-fill me-2"></i> Empleados
+                  </Nav.Link>
+                )}
+                {tienePermiso('ver_clientes') && (
+                  <Nav.Link 
+                    onClick={() => manejarNavegacion("/clientes")} 
+                    className={`nav-link-custom ${location.pathname === '/clientes' ? 'nav-link-active' : ''}`}
+                  >
+                    <i className="bi-person-lines-fill me-2"></i> Clientes
+                  </Nav.Link>
+                )}
+                {tienePermiso('ver_permisos') && (
+                  <Nav.Link 
+                    onClick={() => manejarNavegacion("/permisos")} 
+                    className={`nav-link-custom ${location.pathname === '/permisos' ? 'nav-link-active' : ''}`}
+                  >
+                    <i className="bi-shield-lock-fill me-2"></i> Permisos
+                  </Nav.Link>
+                )}
+                {tienePermiso('ver_catalogo') && (
+                  <Nav.Link 
+                    onClick={() => manejarNavegacion("/catalogo")} 
+                    className={`nav-link-custom ${location.pathname === '/catalogo' ? 'nav-link-active' : ''}`}
+                  >
+                    <i className="bi-layout-text-window-reverse me-2"></i> Catálogo
+                  </Nav.Link>
+                )}
                 <div className="ms-lg-3 mt-3 mt-lg-0 w-100 w-lg-auto">
                   <Button 
                     variant="primary" 
