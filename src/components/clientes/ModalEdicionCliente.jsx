@@ -32,9 +32,9 @@ const ModalEdicionCliente = ({
       <Modal.Body>
         <Form>
           <Row>
-            <Col xs={12} md={12}>
+            <Col xs={12} md={6}>
               <Form.Group className="mb-3">
-                <Form.Label>Nombre Completo *</Form.Label>
+                <Form.Label>Nombre *</Form.Label>
                 <Form.Control
                   type="text"
                   name="nombre"
@@ -47,11 +47,11 @@ const ModalEdicionCliente = ({
 
             <Col xs={12} md={6}>
               <Form.Group className="mb-3">
-                <Form.Label>Correo Electrónico *</Form.Label>
+                <Form.Label>Apellido *</Form.Label>
                 <Form.Control
-                  type="email"
-                  name="correo"
-                  value={clienteEditar.correo || ""}
+                  type="text"
+                  name="apellido"
+                  value={clienteEditar.apellido || ""}
                   onChange={manejoCambioInputEdicion}
                   required
                 />
@@ -60,11 +60,11 @@ const ModalEdicionCliente = ({
 
             <Col xs={12} md={6}>
               <Form.Group className="mb-3">
-                <Form.Label>Teléfono / Celular *</Form.Label>
+                <Form.Label>Celular *</Form.Label>
                 <Form.Control
                   type="tel"
-                  name="telefono"
-                  value={clienteEditar.telefono || ""}
+                  name="celular"
+                  value={clienteEditar.celular || ""}
                   onChange={manejoCambioInputEdicion}
                   required
                 />

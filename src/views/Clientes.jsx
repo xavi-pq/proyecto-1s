@@ -20,15 +20,15 @@ const Clientes = () => {
 
   const [nuevoCliente, setNuevoCliente] = useState({
     nombre: "",
-    correo: "",
-    telefono: "",
+    apellido: "",
+    celular: "",
   });
 
   const [clienteEditar, setClienteEditar] = useState({
     id_cliente: "",
     nombre: "",
-    correo: "",
-    telefono: "",
+    apellido: "",
+    celular: "",
   });
 
   const [clienteSeleccionado, setClienteSeleccionado] = useState(null);
@@ -56,12 +56,12 @@ const Clientes = () => {
       const textoLower = textoBusqueda.toLowerCase().trim();
       const filtrados = clientes.filter((cli) => {
         const nombre = cli.nombre?.toLowerCase() || "";
-        const correo = cli.correo?.toLowerCase() || "";
-        const telefono = cli.telefono?.toLowerCase() || "";
+        const apellido = cli.apellido?.toLowerCase() || "";
+        const celular = cli.celular?.toLowerCase() || "";
         return (
           nombre.includes(textoLower) ||
-          correo.includes(textoLower) ||
-          telefono.includes(textoLower)
+          apellido.includes(textoLower) ||
+          celular.includes(textoLower)
         );
       });
       setClientesFiltrados(filtrados);
@@ -94,8 +94,8 @@ const Clientes = () => {
     try {
       if (
         !nuevoCliente.nombre.trim() ||
-        !nuevoCliente.correo.trim() ||
-        !nuevoCliente.telefono
+        !nuevoCliente.apellido.trim() ||
+        !nuevoCliente.celular
       ) {
         setToast({
           mostrar: true,
@@ -121,10 +121,8 @@ const Clientes = () => {
         {
           id_cliente: siguienteId,
           nombre: nuevoCliente.nombre,
-          correo: nuevoCliente.correo,
-          telefono: nuevoCliente.telefono,
-          activo: true,
-          fecha_registro: new Date().toISOString()
+          apellido: nuevoCliente.apellido,
+          celular: nuevoCliente.celular,
         },
       ]);
 
@@ -132,8 +130,8 @@ const Clientes = () => {
 
       setNuevoCliente({
         nombre: "",
-        correo: "",
-        telefono: "",
+        apellido: "",
+        celular: "",
       });
 
       setToast({ mostrar: true, mensaje: "Cliente registrado correctamente", tipo: "exito" });
@@ -148,8 +146,8 @@ const Clientes = () => {
     try {
       if (
         !clienteEditar.nombre.trim() ||
-        !clienteEditar.correo.trim() ||
-        !clienteEditar.telefono
+        !clienteEditar.apellido.trim() ||
+        !clienteEditar.celular
       ) {
         setToast({
           mostrar: true,
@@ -165,8 +163,8 @@ const Clientes = () => {
         .from("clientes")
         .update({
           nombre: clienteEditar.nombre,
-          correo: clienteEditar.correo,
-          telefono: clienteEditar.telefono,
+          apellido: clienteEditar.apellido,
+          celular: clienteEditar.celular,
         })
         .eq("id_cliente", clienteEditar.id_cliente);
 
@@ -177,8 +175,8 @@ const Clientes = () => {
       setClienteEditar({
         id_cliente: "",
         nombre: "",
-        correo: "",
-        telefono: "",
+        apellido: "",
+        celular: "",
       });
 
       setToast({ mostrar: true, mensaje: "Cliente actualizado correctamente", tipo: "exito" });
@@ -210,8 +208,8 @@ const Clientes = () => {
     setClienteEditar({
       id_cliente: cli.id_cliente,
       nombre: cli.nombre,
-      correo: cli.correo,
-      telefono: cli.telefono,
+      apellido: cli.apellido,
+      celular: cli.celular,
     });
     setMostrarModalEdicion(true);
   };
@@ -256,7 +254,7 @@ const Clientes = () => {
             <CuadroBusquedas
               textoBusqueda={textoBusqueda}
               manejarCambioBusqueda={manejarBusqueda}
-              placeholder="Buscar por nombre, correo o teléfono..."
+              placeholder="Buscar por nombre, apellido o celular..."
             />
           </Col>
         </Row>
@@ -281,12 +279,9 @@ const Clientes = () => {
                   </div>
                 </div>
                 <Card.Body className="p-3 text-center">
-                  <h6 className="fw-bold text-dark mb-1">{cli.nombre}</h6>
+                  <h6 className="fw-bold text-dark mb-1">{cli.nombre} {cli.apellido}</h6>
                   <p className="text-muted small mb-0">
-                    <i className="bi-envelope-fill me-1"></i> {cli.correo}
-                  </p>
-                  <p className="text-muted small mb-0 mt-1">
-                    <i className="bi-telephone-fill me-1"></i> {cli.telefono}
+                    <i className="bi-telephone-fill me-1"></i> {cli.celular}
                   </p>
                 </Card.Body>
                 <Card.Footer className="bg-transparent border-0 p-3 pt-0">
@@ -350,12 +345,9 @@ const Clientes = () => {
                   <i className="bi-person-fill text-info display-2"></i>
                 </div>
               </div>
-              <h4 className="fw-bold text-dark mb-1">{clienteSeleccionado.nombre}</h4>
-              <p className="text-muted mb-1">
-                <i className="bi-envelope-fill me-2"></i> {clienteSeleccionado.correo}
-              </p>
+              <h4 className="fw-bold text-dark mb-1">{clienteSeleccionado.nombre} {clienteSeleccionado.apellido}</h4>
               <p className="text-muted mb-3">
-                <i className="bi-telephone-fill me-2"></i> {clienteSeleccionado.telefono}
+                <i className="bi-telephone-fill me-2"></i> {clienteSeleccionado.celular}
               </p>
               <div className="text-start">
                 <Row className="g-3">

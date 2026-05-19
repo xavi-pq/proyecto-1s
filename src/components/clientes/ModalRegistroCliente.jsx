@@ -32,15 +32,15 @@ const ModalRegistroCliente = ({
       <Modal.Body>
         <Form>
           <Row>
-            <Col xs={12} md={12}>
+            <Col xs={12} md={6}>
               <Form.Group className="mb-3">
-                <Form.Label>Nombre Completo *</Form.Label>
+                <Form.Label>Nombre *</Form.Label>
                 <Form.Control
                   type="text"
                   name="nombre"
                   value={nuevoCliente.nombre || ""}
                   onChange={manejoCambioInput}
-                  placeholder="Nombre y apellido del cliente"
+                  placeholder="Nombre del cliente"
                   required
                 />
               </Form.Group>
@@ -48,13 +48,13 @@ const ModalRegistroCliente = ({
 
             <Col xs={12} md={6}>
               <Form.Group className="mb-3">
-                <Form.Label>Correo Electrónico *</Form.Label>
+                <Form.Label>Apellido *</Form.Label>
                 <Form.Control
-                  type="email"
-                  name="correo"
-                  value={nuevoCliente.correo || ""}
+                  type="text"
+                  name="apellido"
+                  value={nuevoCliente.apellido || ""}
                   onChange={manejoCambioInput}
-                  placeholder="ejemplo@correo.com"
+                  placeholder="Apellido del cliente"
                   required
                 />
               </Form.Group>
@@ -62,11 +62,11 @@ const ModalRegistroCliente = ({
 
             <Col xs={12} md={6}>
               <Form.Group className="mb-3">
-                <Form.Label>Teléfono / Celular *</Form.Label>
+                <Form.Label>Celular *</Form.Label>
                 <Form.Control
                   type="tel"
-                  name="telefono"
-                  value={nuevoCliente.telefono || ""}
+                  name="celular"
+                  value={nuevoCliente.celular || ""}
                   onChange={manejoCambioInput}
                   placeholder="Número de celular"
                   required

@@ -196,17 +196,18 @@ const Empleados = () => {
   };
 
   return (
-    <Container className="mt-3">
-      <Row className="align-items-center mb-3">
-        <Col>
-          <h3><i className="bi-person-badge-fill me-2"></i>Empleados</h3>
-        </Col>
-        <Col className="text-end">
-          <Button onClick={() => setMostrarModal(true)}>
-            <i className="bi-plus-lg me-1"></i>Nuevo Empleado
-          </Button>
-        </Col>
-      </Row>
+    <div className="margen-superior-main">
+      <Container className="mt-3">
+        <Row className="align-items-center mb-3">
+          <Col>
+            <h3><i className="bi-person-badge-fill me-2"></i>Empleados</h3>
+          </Col>
+          <Col className="text-end">
+            <Button onClick={() => setMostrarModal(true)}>
+              <i className="bi-plus-lg me-1"></i>Nuevo Empleado
+            </Button>
+          </Col>
+        </Row>
 
       <Row className="mb-4">
         <Col md={6}>
@@ -282,7 +283,8 @@ const Empleados = () => {
         tipo={toast.tipo}
         onCerrar={() => setToast({ ...toast, mostrar: false })}
       />
-    </Container>
+      </Container>
+    </div>
   );
 };
 

@@ -100,7 +100,6 @@ const ModalEdicionEmpleado = ({
               <option value="cajero">Cajero</option>
               <option value="mesero">Mesero</option>
               <option value="chef">Chef / Cocinero</option>
-              <option value="cliente">Cliente (Sólo catálogo)</option>
             </Form.Select>
           </Form.Group>
         </Form>
