@@ -5,7 +5,9 @@ import "bootstrap-icons/font/bootstrap-icons.css";
 const TarjetaCategoria = ({
   categorias,
   abrirModalEdicion,
-  abrirModalEliminacion
+  abrirModalEliminacion,
+  generarPDFCategoria,
+  copiarCategoria,
 }) => {
   const [cargando, setCargando] = useState(true);
   const [idTarjetaActiva, setIdTarjetaActiva] = useState(null);
@@ -96,6 +98,18 @@ const TarjetaCategoria = ({
                     onClick={(e) => e.stopPropagation()}
                   >
                     <Button
+                      variant="outline-success"
+                      size="sm"
+                      onClick={() => {
+                        copiarCategoria(categoria);
+                        setIdTarjetaActiva(null);
+                      }}
+                      aria-label={`Copiar ${categoria.nombre_categoria}`}
+                    >
+                      <i className="bi bi-clipboard"></i>
+                    </Button>
+
+                    <Button
                       variant="outline-warning"
                       size="sm"
                       onClick={() => {
@@ -117,6 +131,18 @@ const TarjetaCategoria = ({
                       aria-label={`Eliminar ${categoria.nombre_categoria}`}
                     >
                       <i className="bi bi-trash"></i>
+                    </Button>
+                    
+                    <Button
+                      variant="outline-primary"
+                      size="sm"
+                      onClick={() => {
+                        generarPDFCategoria(categoria);
+                        setIdTarjetaActiva(null);
+                      }}
+                      aria-label={`Generar PDF de ${categoria.nombre_categoria}`}
+                    >
+                      <i className="bi bi-file-earmark-pdf"></i>
                     </Button>
                   </div>
                 </div>

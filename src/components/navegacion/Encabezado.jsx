@@ -3,9 +3,11 @@ import { useNavigate, useLocation } from "react-router-dom";
 import { Container, Nav, Navbar, Button } from "react-bootstrap";
 import { supabase } from "../../database/supabaseconfig";
 import { useAuth } from "../../context/AuthContext";
+import ChatIA from "../ia/ChatIA";
 
 const Encabezado = () => {
   const [mostrarMenu, setMostrarMenu] = useState(false);
+  const [mostrarChatIA, setMostrarChatIA] = useState(false);
   const [tema, setTema] = useState(localStorage.getItem("tema") || "light");
   const navigate = useNavigate();
   const location = useLocation();
@@ -37,11 +39,12 @@ const Encabezado = () => {
   const esLogin = location.pathname === "/login";
 
   return (
-    <Navbar 
-      expand="lg" 
-      fixed="top" 
-      className="color-navbar py-2"
-    >
+    <>
+      <Navbar 
+        expand="lg" 
+        fixed="top" 
+        className="color-navbar py-2"
+      >
       <Container>
         <Navbar.Brand 
           onClick={() => navigate("/")} 
@@ -146,6 +149,14 @@ const Encabezado = () => {
                     <i className="bi-person-lines-fill me-2"></i> Clientes
                   </Nav.Link>
                 )}
+                {tienePermiso('ver_ventas') && (
+                  <Nav.Link 
+                    onClick={() => manejarNavegacion("/ventas")} 
+                    className={`nav-link-custom ${location.pathname === '/ventas' ? 'nav-link-active' : ''}`}
+                  >
+                    <i className="bi-receipt-cutoff me-2"></i> Ventas
+                  </Nav.Link>
+                )}
                 {tienePermiso('ver_permisos') && (
                   <Nav.Link 
                     onClick={() => manejarNavegacion("/permisos")} 
@@ -162,6 +173,14 @@ const Encabezado = () => {
                     <i className="bi-layout-text-window-reverse me-2"></i> Catálogo
                   </Nav.Link>
                 )}
+                {estaLogueado && (
+                  <Nav.Link 
+                    onClick={() => setMostrarChatIA(true)} 
+                    className="nav-link-custom text-primary"
+                  >
+                    <i className="bi bi-robot me-2"></i> Asistente IA
+                  </Nav.Link>
+                )}
                 <div className="ms-lg-3 mt-3 mt-lg-0 w-100 w-lg-auto">
                   <Button 
                     variant="primary" 
@@ -176,7 +195,9 @@ const Encabezado = () => {
           </Nav>
         </Navbar.Collapse>
       </Container>
-    </Navbar>
+      </Navbar>
+      <ChatIA mostrar={mostrarChatIA} onCerrar={() => setMostrarChatIA(false)} />
+    </>
   );
 };
 

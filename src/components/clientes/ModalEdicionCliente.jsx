@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Modal, Form, Button, Row, Col } from "react-bootstrap";
+import { Modal, Form, Button } from "react-bootstrap";
 
 const ModalEdicionCliente = ({
   mostrarModalEdicion,
@@ -22,58 +22,45 @@ const ModalEdicionCliente = ({
       show={mostrarModalEdicion}
       onHide={() => setMostrarModalEdicion(false)}
       backdrop="static"
+      keyboard={false}
       centered
-      size="lg"
     >
       <Modal.Header closeButton>
         <Modal.Title>Editar Cliente</Modal.Title>
       </Modal.Header>
-
       <Modal.Body>
         <Form>
-          <Row>
-            <Col xs={12} md={6}>
-              <Form.Group className="mb-3">
-                <Form.Label>Nombre *</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="nombre"
-                  value={clienteEditar.nombre || ""}
-                  onChange={manejoCambioInputEdicion}
-                  required
-                />
-              </Form.Group>
-            </Col>
+          <Form.Group className="mb-3">
+            <Form.Label>Nombre *</Form.Label>
+            <Form.Control
+              type="text"
+              name="nombre_cliente"
+              value={clienteEditar.nombre_cliente}
+              onChange={manejoCambioInputEdicion}
+            />
+          </Form.Group>
 
-            <Col xs={12} md={6}>
-              <Form.Group className="mb-3">
-                <Form.Label>Apellido *</Form.Label>
-                <Form.Control
-                  type="text"
-                  name="apellido"
-                  value={clienteEditar.apellido || ""}
-                  onChange={manejoCambioInputEdicion}
-                  required
-                />
-              </Form.Group>
-            </Col>
+          <Form.Group className="mb-3">
+            <Form.Label>Apellido</Form.Label>
+            <Form.Control
+              type="text"
+              name="apellido_cliente"
+              value={clienteEditar.apellido_cliente}
+              onChange={manejoCambioInputEdicion}
+            />
+          </Form.Group>
 
-            <Col xs={12} md={6}>
-              <Form.Group className="mb-3">
-                <Form.Label>Celular *</Form.Label>
-                <Form.Control
-                  type="tel"
-                  name="celular"
-                  value={clienteEditar.celular || ""}
-                  onChange={manejoCambioInputEdicion}
-                  required
-                />
-              </Form.Group>
-            </Col>
-          </Row>
+          <Form.Group className="mb-3">
+            <Form.Label>Celular *</Form.Label>
+            <Form.Control
+              type="tel"
+              name="celular"
+              value={clienteEditar.celular}
+              onChange={manejoCambioInputEdicion}
+            />
+          </Form.Group>
         </Form>
       </Modal.Body>
-
       <Modal.Footer>
         <Button variant="secondary" onClick={() => setMostrarModalEdicion(false)}>
           Cancelar
@@ -81,9 +68,9 @@ const ModalEdicionCliente = ({
         <Button
           variant="primary"
           onClick={handleActualizar}
-          disabled={deshabilitado}
+          disabled={!clienteEditar.nombre_cliente?.trim() || !clienteEditar.celular?.trim() || deshabilitado}
         >
-          Actualizar
+          Actualizar Cliente
         </Button>
       </Modal.Footer>
     </Modal>

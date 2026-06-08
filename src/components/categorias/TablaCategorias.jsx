@@ -6,6 +6,8 @@ const TablaCategorias = ({
   categorias,
   abrirModalEdicion,
   abrirModalEliminacion,
+  generarPDFCategoria,
+  copiarCategoria,
 }) => {
   return (
     <Card className="border-0 shadow-sm rounded-4 overflow-hidden">
@@ -32,6 +34,15 @@ const TablaCategorias = ({
                 <td className="px-4 py-3 text-end">
                   <div className="d-flex justify-content-end gap-2">
                     <Button
+                      variant="outline-success"
+                      size="sm"
+                      className="border-0 bg-success bg-opacity-10 text-success"
+                      onClick={() => copiarCategoria(cat)}
+                      title="Copiar al portapapeles"
+                    >
+                      <i className="bi bi-clipboard"></i>
+                    </Button>
+                    <Button
                       variant="outline-warning"
                       size="sm"
                       className="border-0 bg-warning bg-opacity-10 text-warning"
@@ -46,6 +57,14 @@ const TablaCategorias = ({
                       onClick={() => abrirModalEliminacion(cat)}
                     >
                       <i className="bi-trash"></i>
+                    </Button>
+                    <Button
+                      variant="outline-primary"
+                      size="sm"
+                      className="border-0 bg-primary bg-opacity-10 text-primary"
+                      onClick={() => generarPDFCategoria(cat)}
+                    >
+                      <i className="bi bi-file-earmark-pdf"></i>
                     </Button>
                   </div>
                 </td>

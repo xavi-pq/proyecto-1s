@@ -6,6 +6,8 @@ import ModalEdicionProducto from "../components/productos/ModalEdicionProducto";
 import ModalEliminacionProducto from "../components/productos/ModalEliminacionProducto";
 import NotificacionOperacion from "../components/NotificacionOperacion";
 import CuadroBusquedas from "../components/busquedas/CuadroBusquedas";
+import ModalQRProducto from "../components/productos/ModalQRProducto";
+
 
 const Productos = () => {
   const [productos, setProductos] = useState([]);
@@ -42,6 +44,8 @@ const Productos = () => {
   const [productoSeleccionado, setProductoSeleccionado] = useState(null);
   const [productoAEliminar, setProductoAEliminar] = useState(null);
   const [toast, setToast] = useState({ mostrar: false, mensaje: "", tipo: "" });
+  const [mostrarModalQR, setMostrarModalQR] = useState(false);
+  const [productoQR, setProductoQR] = useState(null);
 
   const manejoCambioInput = (e) => {
     const { name, value } = e.target;
@@ -319,6 +323,41 @@ const Productos = () => {
     setMostrarDetalles(true);
   };
 
+  const copiarProducto = async (producto) => {
+    if (!producto) return;
+    const nombreMostrar = producto.nombre || producto.nombre_producto || "Producto";
+    const texto = `ID: ${producto.id_producto}\nProducto: ${nombreMostrar}\nDescripción: ${producto.descripcion_producto || 'Sin descripción'}\nPrecio: C$ ${Number(producto.precio).toFixed(2)}`;
+    try {
+      await navigator.clipboard.writeText(texto);
+      setToast({
+        mostrar: true,
+        mensaje: `Producto "${nombreMostrar}" copiado al portapapeles.`,
+        tipo: 'exito',
+      });
+    } catch (err) {
+      console.error("Error al copiar: ", err);
+      setToast({
+        mostrar: true,
+        mensaje: "No se pudo copiar al portapapeles",
+        tipo: 'error',
+      });
+    }
+  };
+
+  const generarQRImagen = (producto) => {
+    const url = producto?.imagen__url || producto?.url_imagen;
+    if (!url) {
+      setToast({
+        mostrar: true,
+        mensaje: "Este producto no tiene imagen asociada",
+        tipo: "advertencia"
+      });
+      return;
+    }
+    setProductoQR(producto);
+    setMostrarModalQR(true);
+  };
+
   return (
     <div className="animate-fade-in pb-5 margen-superior-main">
       <div className="bg-primary bg-gradient text-white py-4 mb-4 shadow-sm rounded-4 mx-2 mx-md-3 mt-3">
@@ -397,6 +436,14 @@ const Productos = () => {
                       <i className="bi-trash me-1"></i>Eliminar
                     </Button>
                   </div>
+                  <div className="d-flex gap-2 mb-2">
+                    <Button variant="outline-success" size="sm" className="w-100 rounded-pill" onClick={() => copiarProducto(prod)} title="Copiar al portapapeles">
+                      <i className="bi bi-clipboard me-1"></i>Copiar
+                    </Button>
+                    <Button variant="outline-info" size="sm" className="w-100 rounded-pill" onClick={() => generarQRImagen(prod)} title="Generar QR de la imagen">
+                      <i className="bi bi-qr-code me-1"></i>Ver QR
+                    </Button>
+                  </div>
                   <Button variant="outline-primary" size="sm" className="w-100 rounded-pill" onClick={() => verDetalles(prod)}>
                     Ver detalles
                   </Button>
@@ -432,6 +479,12 @@ const Productos = () => {
         onHide={() => setMostrarModalEliminacion(false)}
         producto={productoAEliminar}
         onConfirmar={eliminarProducto}
+      />
+
+      <ModalQRProducto
+        mostrar={mostrarModalQR}
+        onHide={() => setMostrarModalQR(false)}
+        producto={productoQR}
       />
 
       <NotificacionOperacion

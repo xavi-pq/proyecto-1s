@@ -11,6 +11,8 @@ import TarjetaCategoria from "../components/categorias/TarjetaCategoria";
 import NotificacionOperacion from "../components/NotificacionOperacion";
 import Paginacion from "../components/Paginacion";
 import emailjs from '@emailjs/browser';
+import jsPDF from "jspdf";
+import autoTable from "jspdf-autotable";
 
 const Categorias = () => {
   const navigate = useNavigate();
@@ -263,6 +265,74 @@ const Categorias = () => {
       });
   };
 
+  const generarPDFCategoria = (categoria) => {
+    const doc = new jsPDF();
+
+    // Título
+    doc.setFontSize(18);
+    doc.text("Reporte de Categoría", 14, 20);
+
+    // Línea decorativa
+    doc.line(14, 25, 195, 25);
+
+    // Información de la categoría
+    doc.setFontSize(12);
+
+    autoTable(doc, {
+      startY: 35,
+      head: [["Campo", "Valor"]],
+      body: [
+        ["ID", categoria.id_categoria],
+        ["Nombre", categoria.nombre_categoria],
+        ["Descripción", categoria.descripcion_categoria],
+      ],
+    });
+
+    // Descargar PDF
+    doc.save(`categoria_${categoria.id_categoria}.pdf`);
+  };
+
+  const copiarCategoria = async (categoria) => {
+    if (!categoria) return;
+    const nombreMostrar = categoria.nombre_categoria || "Categoría";
+    const texto = `ID: ${categoria.id_categoria}\nCategoría: ${nombreMostrar}\nDescripción: ${categoria.descripcion_categoria || 'Sin descripción'}`;
+    try {
+      await navigator.clipboard.writeText(texto);
+      setToast({
+        mostrar: true,
+        mensaje: `Categoría "${nombreMostrar}" copiada al portapapeles.`,
+        tipo: 'exito',
+      });
+    } catch (err) {
+      console.error("Error al copiar: ", err);
+      setToast({
+        mostrar: true,
+        mensaje: "No se pudo copiar al portapapeles",
+        tipo: 'error',
+      });
+    }
+  };
+
+  const copiarCategoria = async (categoria) => {
+    if (!categoria) return;
+    const texto = `ID: ${categoria.id_categoria}\nCategoría: ${categoria.nombre_categoria}\nDescripción: ${categoria.descripcion_categoria || 'Sin descripción'}`;
+    try {
+      await navigator.clipboard.writeText(texto);
+      setToast({
+        mostrar: true,
+        mensaje: `Categoría "${categoria.nombre_categoria}" copiada al portapapeles.`,
+        tipo: 'exito',
+      });
+    } catch (err) {
+      console.error("Error al copiar:", err);
+      setToast({
+        mostrar: true,
+        mensaje: "No se pudo copiar al portapapeles",
+        tipo: 'error',
+      });
+    }
+  };
+
   return (
     <div className="animate-fade-in margen-superior-main">
       <div className="bg-primary bg-gradient text-white py-4 mb-4 shadow-sm rounded-4 mx-2 mx-md-3 mt-3">
@@ -356,6 +426,8 @@ const Categorias = () => {
                 categorias={categoriasPaginadas}
                 abrirModalEdicion={abrirModalEdicion}
                 abrirModalEliminacion={abrirModalEliminacion}
+                generarPDFCategoria={generarPDFCategoria}
+                copiarCategoria={copiarCategoria}
               />
             </div>
 
@@ -367,6 +439,8 @@ const Categorias = () => {
                     categorias={categoriasPaginadas}
                     abrirModalEdicion={abrirModalEdicion}
                     abrirModalEliminacion={abrirModalEliminacion}
+                    generarPDFCategoria={generarPDFCategoria}
+                    copiarCategoria={copiarCategoria}
                   />
                 </Col>
               </Row>

@@ -2,41 +2,46 @@ import React, { useState } from "react";
 import { Modal, Button } from "react-bootstrap";
 
 const ModalEliminacionCliente = ({
-  mostrar,
-  onHide,
+  mostrarModalEliminacion,
+  setMostrarModalEliminacion,
+  eliminarCliente,
   cliente,
-  onConfirmar,
 }) => {
-  const [cargando, setCargando] = useState(false);
+  const [deshabilitado, setDeshabilitado] = useState(false);
 
   const handleEliminar = async () => {
-    if (!cliente) return;
-    setCargando(true);
-    await onConfirmar(cliente.id_cliente);
-    setCargando(false);
+    if (deshabilitado) return;
+    setDeshabilitado(true);
+    await eliminarCliente();
+    setDeshabilitado(false);
   };
 
   return (
-    <Modal show={mostrar} onHide={onHide} centered backdrop="static" size="sm">
-      <Modal.Body className="text-center p-4">
-        <div className="bg-danger bg-opacity-10 text-danger rounded-circle d-inline-flex align-items-center justify-content-center mb-4" style={{ width: "80px", height: "80px" }}>
-          <i className="bi-trash-fill display-5"></i>
-        </div>
-        <h4 className="fw-bold text-dark mb-2">¿Eliminar cliente?</h4>
-        <p className="text-muted small mb-4">
-          Estás a punto de eliminar a <strong>"{cliente?.nombre} {cliente?.apellido}"</strong>. Esta acción no se puede deshacer.
-        </p>
-        <div className="d-flex flex-column gap-2">
-          <Button variant="danger" className="fw-semibold py-2" onClick={handleEliminar} disabled={cargando}>
-            {cargando ? (
-              <><span className="spinner-border spinner-border-sm me-2"></span>Eliminando...</>
-            ) : "Sí, eliminar cliente"}
-          </Button>
-          <Button variant="light" className="fw-semibold py-2 text-muted" onClick={onHide} disabled={cargando}>
-            No, cancelar
-          </Button>
-        </div>
+    <Modal
+      show={mostrarModalEliminacion}
+      onHide={() => setMostrarModalEliminacion(false)}
+      backdrop="static"
+      keyboard={false}
+      centered
+    >
+      <Modal.Header closeButton>
+        <Modal.Title>Confirmar Eliminación</Modal.Title>
+      </Modal.Header>
+      <Modal.Body>
+        ¿Estás seguro de que deseas eliminar al cliente{" "}
+        <strong>
+          {cliente?.nombre_cliente} {cliente?.apellido_cliente}
+        </strong>
+        ?
       </Modal.Body>
+      <Modal.Footer>
+        <Button variant="secondary" onClick={() => setMostrarModalEliminacion(false)}>
+          Cancelar
+        </Button>
+        <Button variant="danger" onClick={handleEliminar} disabled={deshabilitado}>
+          Eliminar Cliente
+        </Button>
+      </Modal.Footer>
     </Modal>
   );
 };
