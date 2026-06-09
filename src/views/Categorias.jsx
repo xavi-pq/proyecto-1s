@@ -313,26 +313,6 @@ const Categorias = () => {
     }
   };
 
-  const copiarCategoria = async (categoria) => {
-    if (!categoria) return;
-    const texto = `ID: ${categoria.id_categoria}\nCategoría: ${categoria.nombre_categoria}\nDescripción: ${categoria.descripcion_categoria || 'Sin descripción'}`;
-    try {
-      await navigator.clipboard.writeText(texto);
-      setToast({
-        mostrar: true,
-        mensaje: `Categoría "${categoria.nombre_categoria}" copiada al portapapeles.`,
-        tipo: 'exito',
-      });
-    } catch (err) {
-      console.error("Error al copiar:", err);
-      setToast({
-        mostrar: true,
-        mensaje: "No se pudo copiar al portapapeles",
-        tipo: 'error',
-      });
-    }
-  };
-
   return (
     <div className="animate-fade-in margen-superior-main">
       <div className="bg-primary bg-gradient text-white py-4 mb-4 shadow-sm rounded-4 mx-2 mx-md-3 mt-3">
