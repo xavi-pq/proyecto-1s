@@ -50,7 +50,7 @@ const TarjetaCliente = ({
                     alternarTarjetaActiva(cliente.id_cliente);
                   }
                 }}
-                aria-label={`Cliente ${cliente.nombre_cliente}`}
+                aria-label={`Cliente ${cliente.nombre}`}
               >
                 <Card.Body
                   className={`p-2 tarjeta-cliente-cuerpo ${
@@ -67,7 +67,7 @@ const TarjetaCliente = ({
                     </Col>
                     <Col xs={6} className="text-start">
                       <div className="fw-semibold text-truncate">
-                        {cliente.nombre_cliente} {cliente.apellido_cliente}
+                        {cliente.nombre} {cliente.apellido}
                       </div>
                       <div className="small text-muted text-truncate">
                         {cliente.celular}

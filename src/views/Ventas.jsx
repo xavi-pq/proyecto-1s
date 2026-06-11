@@ -58,9 +58,9 @@ const Ventas = () => {
         .from("ventas")
         .select(`
           *,
-          clientes (nombre_cliente, apellido_cliente),
+          clientes (nombre, apellido),
           empleados (nombre_empleado, apellido_empleado),
-          detalles_ventas (*, productos (nombre_producto))
+          detalle_ventas (*, productos (nombre, precio))
         `)
         .order("fecha_venta", { ascending: false });
 
@@ -93,10 +93,10 @@ const Ventas = () => {
       setEmpleadoSeleccionado(empleado || null);
       setMetodoPago(ventaAEditar.metodo_pago || "efectivo");
 
-      if (ventaAEditar.detalles_ventas?.length > 0) {
-        const detallesFormateados = ventaAEditar.detalles_ventas.map(d => ({
+      if (ventaAEditar.detalle_ventas?.length > 0) {
+        const detallesFormateados = ventaAEditar.detalle_ventas.map(d => ({
           id_producto: d.id_producto,
-          nombre_producto: d.productos?.nombre_producto || "Producto",
+          nombre_producto: d.productos?.nombre || "Producto",
           precio: d.precio_unitario,
           cantidad: d.cantidad
         }));
@@ -120,7 +120,7 @@ const Ventas = () => {
     } else {
       const textoLower = textoBusqueda.toLowerCase();
       const filtradas = ventas.filter(v =>
-        `${v.clientes?.nombre_cliente || ''} ${v.clientes?.apellido_cliente || ''}`.toLowerCase().includes(textoLower) ||
+        `${v.clientes?.nombre || ''} ${v.clientes?.apellido || ''}`.toLowerCase().includes(textoLower) ||
         v.empleados?.nombre_empleado?.toLowerCase().includes(textoLower)
       );
       setVentasFiltradas(filtradas);
@@ -156,8 +156,8 @@ const Ventas = () => {
       }
       return [...prev, {
         id_producto: producto.id_producto,
-        nombre_producto: producto.nombre_producto,
-        precio: producto.precio_venta,
+        nombre_producto: producto.nombre,
+        precio: producto.precio,
         cantidad
       }];
     });
@@ -176,7 +176,7 @@ const Ventas = () => {
 
   const guardarVenta = async () => {
     if (!clienteSeleccionado || !empleadoSeleccionado || detalles.length === 0) {
-      setToast({ mostrar: true, mensaje: "Faltan datos obligatorios", tipo: "advertencia" });
+      setToast({ mostrar: true, mensaje: "Selecciona un cliente, empleado y agrega productos", tipo: "advertencia" });
       return;
     }
 
@@ -186,11 +186,11 @@ const Ventas = () => {
         await supabase.from("ventas").update({
           id_cliente: clienteSeleccionado.id_cliente,
           id_empleado: empleadoSeleccionado.id_empleado,
-          metodo_pago: metodoPago,
-          total: totalGeneral
+          total: totalGeneral,
+          metodo_pago: metodoPago
         }).eq("id_venta", ventaAEditar.id_venta);
 
-        await supabase.from("detalles_ventas").delete().eq("id_venta", ventaAEditar.id_venta);
+        await supabase.from("detalle_ventas").delete().eq("id_venta", ventaAEditar.id_venta);
 
         const detallesInsert = detalles.map(d => ({
           id_venta: ventaAEditar.id_venta,
@@ -200,24 +200,27 @@ const Ventas = () => {
           subtotal: d.cantidad * d.precio
         }));
 
-        await supabase.from("detalles_ventas").insert(detallesInsert);
+        await supabase.from("detalle_ventas").insert(detallesInsert);
 
         setToast({ mostrar: true, mensaje: "Venta actualizada exitosamente", tipo: "exito" });
       } else {
         // === NUEVA VENTA ===
         const nicaNow = () => new Date().toLocaleString("sv", { timeZone: "America/Managua" }).replace(" ", "T");
 
-        const { data: ventaData } = await supabase
+        const { data: ventaData, error: ventaError } = await supabase
           .from("ventas")
           .insert([{
             id_cliente: clienteSeleccionado.id_cliente,
             id_empleado: empleadoSeleccionado.id_empleado,
             fecha_venta: nicaNow(),
             metodo_pago: metodoPago,
+            estado: true,
             total: totalGeneral
           }])
           .select()
           .single();
+
+        if (ventaError) throw ventaError;
 
         const detallesInsert = detalles.map(d => ({
           id_venta: ventaData.id_venta,
@@ -227,7 +230,8 @@ const Ventas = () => {
           subtotal: d.cantidad * d.precio
         }));
 
-        await supabase.from("detalles_ventas").insert(detallesInsert);
+        const { error: detalleError } = await supabase.from("detalle_ventas").insert(detallesInsert);
+        if (detalleError) throw detalleError;
 
         setToast({ mostrar: true, mensaje: "Venta registrada exitosamente", tipo: "exito" });
       }
@@ -245,10 +249,10 @@ const Ventas = () => {
   const manejarBusqueda = (e) => setTextoBusqueda(e.target.value);
 
   const handlePrint = (venta) => {
-    const nombreMostrar = venta.nombre_venta?.trim() || `${venta.clientes?.nombre_cliente || ""} ${venta.clientes?.apellido_cliente || ""}`.trim() || "Cliente Genérico";
+    const nombreMostrar = `${venta.clientes?.nombre || ""} ${venta.clientes?.apellido || ""}`.trim() || "Cliente Genérico";
 
-    const fecha = venta.fecha_venta || venta.fecha_hora
-      ? new Date(venta.fecha_venta || venta.fecha_hora).toLocaleString("es-NI", {
+    const fecha = venta.fecha_venta
+      ? new Date(venta.fecha).toLocaleString("es-NI", {
         year: "2-digit",
         month: "2-digit",
         day: "2-digit",
@@ -257,41 +261,14 @@ const Ventas = () => {
       })
       : "-";
 
-    const detalle =
-      venta.detalles_ventas ||
-      venta.detalles_venta ||
-      venta.detalles ||
-      venta.detalle ||
-      [];
+    const detalle = venta.detalle_pedido || [];
 
     let detalleTexto = "DETALLES DE VENTA:\n Cant.  Pre.  Sub.\n--------------------------------\n";
 
     detalle.forEach((item) => {
-      if (item.id_producto) {
-        const nombreProducto =
-          item.productos?.nombre_producto ||
-          item.nombre_producto ||
-          "Producto";
-
-        detalleTexto += `${nombreProducto}\n`;
-        detalleTexto += `   ${item.cantidad}  C$${Number(item.precio_unitario).toFixed(2)}  C$${Number(item.subtotal || item.total_linea || (item.cantidad * item.precio_unitario)).toFixed(2)}\n`;
-      }
-
-      if (item.id_sesion) {
-        const nombreJuego =
-          item.sesiones_juegos?.juegos?.nombre_juego ||
-          item.nombre_juego ||
-          "Juego";
-
-        const minutos = item.cantidad || "-";
-        const monto =
-          item.sesiones_juegos?.monto_cobrado ||
-          item.monto_cobrado ||
-          item.precio_unitario;
-
-        detalleTexto += `${nombreJuego}\n`;
-        detalleTexto += ` Min: ${minutos}  Monto: C$${Number(monto).toFixed(2)}\n`;
-      }
+      const nombreProducto = item.productos?.nombre || "Producto";
+      detalleTexto += `${nombreProducto}\n`;
+      detalleTexto += `   ${item.cantidad}  C$${Number(item.precio_unitario).toFixed(2)}  C$${Number(item.subtotal).toFixed(2)}\n`;
     });
 
     detalleTexto += "--------------------------------";
@@ -302,10 +279,10 @@ const Ventas = () => {
 
     const total = `C$${Number(venta.total).toFixed(2)}`;
     const iva = venta.total * 0.10;
-    const numeroVenta = venta.id_venta || "-";
+    const numeroVenta = venta.id_pedido || "-";
 
     const texto = `
-PEKEPLAY - Ticket de Venta #${numeroVenta}
+DISCOSA - Ticket #${numeroVenta}
 ================================
 Cliente: ${nombreMostrar}
 Fecha: ${fecha}
@@ -313,8 +290,7 @@ Fecha: ${fecha}
 ${detalleTexto}
 IVA: C$${iva.toFixed(2)}
 TOTAL: ${total}
-Metodo: ${venta.metodo_pago || "-"}
-Estado: ${venta.estado !== undefined ? (venta.estado ? "Registrada" : "Anulada") : "Registrada"}
+Estado: ${venta.estado ? "Activo" : "Anulado"}
 ================================
 Gracias por su compra!
 `;
@@ -326,20 +302,27 @@ Gracias por su compra!
   return (
     <div className="animate-fade-in margen-superior-main pb-5">
       <Container>
-        <Row className="align-items-center mb-3">
-          <Col xs={8} lg={8}>
-            <h3 className="mb-0">
-              <i className="bi bi-receipt-cutoff me-2"></i> Ventas
-            </h3>
-          </Col>
-          <Col xs={4} lg={4} className="text-end">
-            <Button onClick={abrirNuevaVenta} size="md">
-              <i className="bi bi-plus-lg"></i>
-              <span className="d-none d-sm-inline ms-2">Nueva Venta</span>
-            </Button>
-          </Col>
-        </Row>
-        <hr />
+        <div className="bg-primary bg-gradient text-white py-4 mb-4 shadow-sm rounded-4 mx-2 mx-md-3 mt-3">
+          <Container>
+            <Row className="align-items-center g-3">
+              <Col xs={8} sm={8} md={8} lg={8} className="d-flex align-items-center">
+                <h3 className="fw-bold mb-0">
+                  <i className="bi bi-receipt-cutoff me-2"></i> Ventas
+                </h3>
+              </Col>
+              <Col xs={4} sm={4} md={4} lg={4} className="text-end">
+                <Button
+                  variant="light"
+                  onClick={abrirNuevaVenta}
+                  className="fw-bold text-primary px-4 py-2 w-100 w-md-auto shadow-sm btn-rounded"
+                >
+                  <i className="bi bi-plus-lg me-2"></i>
+                  <span className="d-none d-sm-inline">Nueva Venta</span>
+                </Button>
+              </Col>
+            </Row>
+          </Container>
+        </div>
 
         <Row className="mb-4">
           <Col md={6} lg={5}>

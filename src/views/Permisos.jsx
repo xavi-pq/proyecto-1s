@@ -83,12 +83,19 @@ const Permisos = () => {
   };
 
   return (
-    <Container className="mt-3">
-      <Row className="align-items-center mb-3">
-        <Col>
-          <h3><i className="bi bi-shield-lock-fill me-2"></i>Gestión de Permisos</h3>
-        </Col>
-      </Row>
+    <div className="animate-fade-in margen-superior-main pb-5">
+      <Container>
+        <div className="bg-primary bg-gradient text-white py-4 mb-4 shadow-sm rounded-4 mx-2 mx-md-3 mt-3">
+          <Container>
+            <Row className="align-items-center g-3">
+              <Col xs={12} className="d-flex align-items-center">
+                <h3 className="fw-bold mb-0">
+                  <i className="bi bi-shield-lock-fill me-2"></i>Gestión de Permisos
+                </h3>
+              </Col>
+            </Row>
+          </Container>
+        </div>
 
       <Row className="mb-4">
         <Col md={6}>
@@ -137,7 +144,8 @@ const Permisos = () => {
         tipo={toast.tipo}
         onCerrar={() => setToast({ ...toast, mostrar: false })}
       />
-    </Container>
+      </Container>
+    </div>
   );
 };
 

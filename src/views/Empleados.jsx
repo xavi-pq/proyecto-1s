@@ -196,18 +196,28 @@ const Empleados = () => {
   };
 
   return (
-    <div className="margen-superior-main">
-      <Container className="mt-3">
-        <Row className="align-items-center mb-3">
-          <Col>
-            <h3><i className="bi-person-badge-fill me-2"></i>Empleados</h3>
-          </Col>
-          <Col className="text-end">
-            <Button onClick={() => setMostrarModal(true)}>
-              <i className="bi-plus-lg me-1"></i>Nuevo Empleado
-            </Button>
-          </Col>
-        </Row>
+    <div className="animate-fade-in margen-superior-main pb-5">
+      <Container>
+        <div className="bg-primary bg-gradient text-white py-4 mb-4 shadow-sm rounded-4 mx-2 mx-md-3 mt-3">
+          <Container>
+            <Row className="align-items-center g-3">
+              <Col xs={8} sm={8} md={8} lg={8} className="d-flex align-items-center">
+                <h3 className="fw-bold mb-0">
+                  <i className="bi-person-badge-fill me-2"></i>Empleados
+                </h3>
+              </Col>
+              <Col xs={4} sm={4} md={4} lg={4} className="text-end">
+                <Button
+                  variant="light"
+                  onClick={() => setMostrarModal(true)}
+                  className="fw-bold text-primary px-4 py-2 w-100 w-md-auto shadow-sm btn-rounded"
+                >
+                  <i className="bi-plus-lg me-2"></i>Nuevo Empleado
+                </Button>
+              </Col>
+            </Row>
+          </Container>
+        </div>
 
       <Row className="mb-4">
         <Col md={6}>

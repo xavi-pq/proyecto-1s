@@ -15,7 +15,7 @@ const ChatIA = ({ mostrar, onCerrar }) => {
   Sistema de ventas. 
   Tablas disponibles:
   - categorias (id_categoria, nombre_categoria, descripcion_categoria)
-  - clientes (id_cliente, nombre_cliente, apellido_cliente, celular)
+  - clientes (id_cliente, nombre, apellido, celular)
   - productos (id_producto, nombre_producto, descripcion_producto, categoria_producto, precio_venta, url_imagen)
   - ventas (id_venta, id_cliente, id_empleado, fecha_venta, metodo_pago, total)
   - detalles_ventas (id_detalle, id_venta, id_producto, cantidad, precio_unitario, subtotal)

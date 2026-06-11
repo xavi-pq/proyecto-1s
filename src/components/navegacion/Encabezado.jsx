@@ -1,26 +1,15 @@
-import React, { useState, useEffect } from "react";
+import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
 import { Container, Nav, Navbar, Button } from "react-bootstrap";
-import { supabase } from "../../database/supabaseconfig";
 import { useAuth } from "../../context/AuthContext";
 import ChatIA from "../ia/ChatIA";
 
 const Encabezado = () => {
   const [mostrarMenu, setMostrarMenu] = useState(false);
   const [mostrarChatIA, setMostrarChatIA] = useState(false);
-  const [tema, setTema] = useState(localStorage.getItem("tema") || "light");
   const navigate = useNavigate();
   const location = useLocation();
   const { tienePermiso, logout, usuario } = useAuth();
-
-  useEffect(() => {
-    document.documentElement.setAttribute("data-theme", tema);
-    localStorage.setItem("tema", tema);
-  }, [tema]);
-
-  const toggleTema = () => {
-    setTema(tema === "light" ? "dark" : "light");
-  };
 
   const manejarToggle = () => setMostrarMenu(!mostrarMenu);
 
@@ -58,13 +47,6 @@ const Encabezado = () => {
         </Navbar.Brand>
 
         <div className="d-flex align-items-center gap-2 ms-auto d-lg-none">
-          <Button 
-            variant="link" 
-            onClick={toggleTema} 
-            className="text-primary p-0 me-2 shadow-none border-0"
-          >
-            <i className={`bi ${tema === 'light' ? 'bi-moon-fill' : 'bi-sun-fill'} h4 mb-0`}></i>
-          </Button>
           <Navbar.Toggle 
             aria-controls="basic-navbar-nav" 
             onClick={manejarToggle}
@@ -76,14 +58,6 @@ const Encabezado = () => {
 
         <Navbar.Collapse id="basic-navbar-nav">
           <Nav className="ms-auto align-items-center gap-1 py-3 py-lg-0">
-            {/* Theme Toggle Desktop */}
-            <Button 
-              variant="link" 
-              onClick={toggleTema} 
-              className="nav-link-custom d-none d-lg-flex align-items-center justify-content-center text-decoration-none border-0"
-            >
-              <i className={`bi ${tema === 'light' ? 'bi-moon-fill' : 'bi-sun-fill'} h5 mb-0`}></i>
-            </Button>
 
             {esLogin ? (
               <Nav.Link 
@@ -110,12 +84,20 @@ const Encabezado = () => {
             ) : (
               <>
                 {tienePermiso('ver_inicio') && (
-                  <Nav.Link 
-                    onClick={() => manejarNavegacion("/")} 
-                    className={`nav-link-custom ${location.pathname === '/' ? 'nav-link-active' : ''}`}
-                  >
-                    <i className="bi-house-fill me-2"></i> Inicio
-                  </Nav.Link>
+                  <>
+                    <Nav.Link 
+                      onClick={() => manejarNavegacion("/")} 
+                      className={`nav-link-custom ${location.pathname === '/' ? 'nav-link-active' : ''}`}
+                    >
+                      <i className="bi-house-fill me-2"></i> Inicio
+                    </Nav.Link>
+                    <Nav.Link 
+                      onClick={() => manejarNavegacion("/dashboard")} 
+                      className={`nav-link-custom ${location.pathname === '/dashboard' ? 'nav-link-active' : ''}`}
+                    >
+                      <i className="bi-bar-chart-fill me-2"></i> Dashboard
+                    </Nav.Link>
+                  </>
                 )}
                 {tienePermiso('ver_categorias') && (
                   <Nav.Link 

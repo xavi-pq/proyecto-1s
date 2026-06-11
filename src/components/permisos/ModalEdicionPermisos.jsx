@@ -31,13 +31,22 @@ const ModalEdicionPermisos = ({
         <p className="text-muted">{rolEditar.descripcion}</p>
 
         <Row>
-          {Object.keys(rolEditar.permisos || {}).map((key) => (
+          {[
+            'ver_inicio',
+            'ver_categorias',
+            'ver_productos',
+            'ver_empleados',
+            'ver_clientes',
+            'ver_ventas',
+            'ver_permisos',
+            'ver_catalogo'
+          ].map((key) => (
             <Col md={6} key={key} className="mb-3">
               <Form.Check
                 type="switch"
                 id={`permiso-${key}`}
                 label={key.replace(/_/g, " ").toUpperCase()}
-                checked={!!rolEditar.permisos[key]}
+                checked={!!rolEditar.permisos?.[key]}
                 onChange={(e) => actualizarSwitch(key, e.target.checked)}
               />
             </Col>

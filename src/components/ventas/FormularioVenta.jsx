@@ -31,13 +31,13 @@ const FormularioVenta = ({
     return new Promise((resolve) => {
       const filtrados = clientes
         .filter(cli => 
-          `${cli.nombre_cliente} ${cli.apellido_cliente} ${cli.celular || ''}`
+          `${cli.nombre} ${cli.apellido} ${cli.celular || ''}`
             .toLowerCase()
             .includes(inputValue.toLowerCase())
         )
         .map(cli => ({
           value: cli.id_cliente,
-          label: `${cli.nombre_cliente} ${cli.apellido_cliente} - ${cli.celular || 'Sin celular'}`,
+          label: `${cli.nombre} ${cli.apellido} - ${cli.celular || 'Sin celular'}`,
           data: cli
         }));
       resolve(filtrados);
@@ -65,11 +65,11 @@ const FormularioVenta = ({
     return new Promise((resolve) => {
       const filtrados = productos
         .filter(p => 
-          p.nombre_producto.toLowerCase().includes(inputValue.toLowerCase())
+          p.nombre?.toLowerCase().includes(inputValue.toLowerCase())
         )
         .map(p => ({
           value: p.id_producto,
-          label: `${p.nombre_producto} - C$${p.precio_venta}`,
+          label: `${p.nombre} - C$${p.precio}`,
           data: p
         }));
       resolve(filtrados);
@@ -106,7 +106,7 @@ const FormularioVenta = ({
                 onChange={(option) => setClienteSeleccionado(option?.data || null)}
                 value={clienteSeleccionado ? {
                   value: clienteSeleccionado.id_cliente,
-                  label: `${clienteSeleccionado.nombre_cliente} ${clienteSeleccionado.apellido_cliente}`
+                  label: `${clienteSeleccionado.nombre} ${clienteSeleccionado.apellido}`
                 } : null}
                 placeholder="Buscar cliente por nombre o celular..."
                 isClearable

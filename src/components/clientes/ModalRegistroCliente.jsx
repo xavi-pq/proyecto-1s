@@ -34,8 +34,8 @@ const ModalRegistroCliente = ({
             <Form.Label>Nombre *</Form.Label>
             <Form.Control
               type="text"
-              name="nombre_cliente"
-              value={nuevoCliente.nombre_cliente}
+              name="nombre"
+              value={nuevoCliente.nombre}
               onChange={manejoCambioInput}
               placeholder="Ingresa el nombre"
             />
@@ -45,8 +45,8 @@ const ModalRegistroCliente = ({
             <Form.Label>Apellido</Form.Label>
             <Form.Control
               type="text"
-              name="apellido_cliente"
-              value={nuevoCliente.apellido_cliente}
+              name="apellido"
+              value={nuevoCliente.apellido}
               onChange={manejoCambioInput}
               placeholder="Ingresa el apellido"
             />
@@ -71,7 +71,7 @@ const ModalRegistroCliente = ({
         <Button
           variant="primary"
           onClick={handleRegistrar}
-          disabled={!nuevoCliente.nombre_cliente.trim() || !nuevoCliente.celular.trim() || deshabilitado}
+          disabled={!nuevoCliente.nombre.trim() || !nuevoCliente.celular.trim() || deshabilitado}
         >
           Guardar Cliente
         </Button>

@@ -67,10 +67,10 @@ const TarjetaVenta = ({
                     </Col>
                     <Col xs={6} className="text-start">
                       <div className="fw-semibold text-truncate">
-                        {venta.clientes?.nombre_cliente} {venta.clientes?.apellido_cliente}
+                        {venta.clientes?.nombre} {venta.clientes?.apellido}
                       </div>
                       <div className="small text-muted text-truncate">
-                        {new Date(venta.fecha_venta).toLocaleString('es-NI')}
+                        {venta.fecha_venta ? new Date(venta.fecha_venta).toLocaleString('es-NI') : '-'}
                       </div>
                     </Col>
                     <Col xs={4} className="text-end">

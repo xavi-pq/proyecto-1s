@@ -2,7 +2,8 @@ import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
 
 import Encabezado from "./components/navegacion/Encabezado";
 
-import Inicio from "./views/Inicio";
+import Home from "./views/Home";
+import Dashboard from "./views/Inicio";
 import Categorias from "./views/Categorias";
 import Catalogo from "./views/Catalogo";
 import Productos from "./views/Productos";
@@ -24,7 +25,8 @@ const App = () => {
         <Routes>
           <Route path="/login" element={<Login />} />
           <Route path="/catalogo" element={<Catalogo />} />
-          <Route path="/" element={<RutaProtegida><Inicio /></RutaProtegida>} />
+          <Route path="/" element={<RutaProtegida><Home /></RutaProtegida>} />
+          <Route path="/dashboard" element={<RutaProtegida><Dashboard /></RutaProtegida>} />
           <Route path="/categorias" element={<RutaProtegida><Categorias /></RutaProtegida>} />
           <Route path="/productos" element={<RutaProtegida><Productos /></RutaProtegida>} />
           <Route path="/empleados" element={<RutaProtegida><Empleados /></RutaProtegida>} />

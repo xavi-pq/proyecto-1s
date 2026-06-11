@@ -14,8 +14,8 @@ const Clientes = () => {
   const [toast, setToast] = useState({ mostrar: false, mensaje: "", tipo: "" });
   const [mostrarModal, setMostrarModal] = useState(false);
   const [nuevoCliente, setNuevoCliente] = useState({
-    nombre_cliente: "",
-    apellido_cliente: "",
+    nombre: "",
+    apellido: "",
     celular: "",
   });
   const [clientes, setClientes] = useState([]);
@@ -29,8 +29,8 @@ const Clientes = () => {
   const [paginaActual, establecerPaginaActual] = useState(1);
   const [clienteEditar, setClienteEditar] = useState({
     id_cliente: "",
-    nombre_cliente: "",
-    apellido_cliente: "",
+    nombre: "",
+    apellido: "",
     celular: "",
   });
 
@@ -50,8 +50,8 @@ const Clientes = () => {
       const textoLower = textoBusqueda.toLowerCase().trim();
       const filtrados = clientes.filter(
         (cli) =>
-          cli.nombre_cliente?.toLowerCase().includes(textoLower) ||
-          cli.apellido_cliente?.toLowerCase().includes(textoLower) ||
+          cli.nombre?.toLowerCase().includes(textoLower) ||
+          cli.apellido?.toLowerCase().includes(textoLower) ||
           cli.celular?.toLowerCase().includes(textoLower)
       );
       setClientesFiltrados(filtrados);
@@ -61,8 +61,8 @@ const Clientes = () => {
   const abrirModalEdicion = (cliente) => {
     setClienteEditar({
       id_cliente: cliente.id_cliente,
-      nombre_cliente: cliente.nombre_cliente,
-      apellido_cliente: cliente.apellido_cliente,
+      nombre: cliente.nombre,
+      apellido: cliente.apellido,
       celular: cliente.celular,
     });
     setMostrarModalEdicion(true);
@@ -91,7 +91,7 @@ const Clientes = () => {
 
   const agregarCliente = async () => {
     try {
-      if (!nuevoCliente.nombre_cliente.trim() || !nuevoCliente.celular.trim()) {
+      if (!nuevoCliente.nombre.trim() || !nuevoCliente.celular.trim()) {
         setToast({
           mostrar: true,
           mensaje: "Debe llenar nombre y celular.",
@@ -102,8 +102,8 @@ const Clientes = () => {
 
       const { error } = await supabase.from("clientes").insert([
         {
-          nombre_cliente: nuevoCliente.nombre_cliente,
-          apellido_cliente: nuevoCliente.apellido_cliente,
+          nombre: nuevoCliente.nombre,
+          apellido: nuevoCliente.apellido,
           celular: nuevoCliente.celular,
         },
       ]);
@@ -120,11 +120,11 @@ const Clientes = () => {
 
       setToast({
         mostrar: true,
-        mensaje: `Cliente "${nuevoCliente.nombre_cliente} ${nuevoCliente.apellido_cliente}" registrado exitosamente.`,
+        mensaje: `Cliente "${nuevoCliente.nombre} ${nuevoCliente.apellido}" registrado exitosamente.`,
         tipo: "exito",
       });
 
-      setNuevoCliente({ nombre_cliente: "", apellido_cliente: "", celular: "" });
+      setNuevoCliente({ nombre: "", apellido: "", celular: "" });
       setMostrarModal(false);
       await cargarClientes();
     } catch (err) {
@@ -206,7 +206,7 @@ const Clientes = () => {
 
   const actualizarCliente = async () => {
     try {
-      if (!clienteEditar.nombre_cliente.trim() || !clienteEditar.celular.trim()) {
+      if (!clienteEditar.nombre.trim() || !clienteEditar.celular.trim()) {
         setToast({
           mostrar: true,
           mensaje: "Debe llenar nombre y celular.",
@@ -219,8 +219,8 @@ const Clientes = () => {
       const { error } = await supabase
         .from("clientes")
         .update({
-          nombre_cliente: clienteEditar.nombre_cliente,
-          apellido_cliente: clienteEditar.apellido_cliente,
+          nombre: clienteEditar.nombre,
+          apellido: clienteEditar.apellido,
           celular: clienteEditar.celular,
         })
         .eq("id_cliente", clienteEditar.id_cliente);
@@ -250,22 +250,29 @@ const Clientes = () => {
   };
 
   return (
-    <Container className="mt-3">
-      {/* Título y botón Nuevo Cliente */}
-      <Row className="align-items-center mb-3">
-        <Col xs={9} sm={7} md={7} lg={7} className="d-flex align-items-center">
-          <h3 className="mb-0">
-            <i className="bi-people-fill me-2"></i> Clientes
-          </h3>
-        </Col>
-        <Col xs={3} sm={5} md={5} lg={5} className="text-end">
-          <Button onClick={() => setMostrarModal(true)} size="md">
-            <i className="bi-plus-lg"></i>
-            <span className="d-none d-sm-inline ms-2">Nuevo Cliente</span>
-          </Button>
-        </Col>
-      </Row>
-      <hr />
+    <div className="animate-fade-in margen-superior-main pb-5">
+      <Container>
+        {/* Título y botón Nuevo Cliente */}
+        <div className="bg-primary bg-gradient text-white py-4 mb-4 shadow-sm rounded-4 mx-2 mx-md-3 mt-3">
+          <Container>
+            <Row className="align-items-center g-3">
+              <Col xs={8} sm={8} md={8} lg={8} className="d-flex align-items-center">
+                <h3 className="fw-bold mb-0">
+                  <i className="bi-people-fill me-2"></i> Clientes
+                </h3>
+              </Col>
+              <Col xs={4} sm={4} md={4} lg={4} className="text-end">
+                <Button
+                  variant="light"
+                  onClick={() => setMostrarModal(true)}
+                  className="fw-bold text-primary px-4 py-2 w-100 w-md-auto shadow-sm btn-rounded"
+                >
+                  <i className="bi-plus-lg me-2"></i> Nuevo Cliente
+                </Button>
+              </Col>
+            </Row>
+          </Container>
+        </div>
 
       {/* Búsqueda */}
       <Row className="mb-4">
@@ -361,7 +368,8 @@ const Clientes = () => {
         tipo={toast.tipo}
         onCerrar={() => setToast({ ...toast, mostrar: false })}
       />
-    </Container>
+      </Container>
+    </div>
   );
 };
 

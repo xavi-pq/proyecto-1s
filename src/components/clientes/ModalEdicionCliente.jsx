@@ -34,8 +34,8 @@ const ModalEdicionCliente = ({
             <Form.Label>Nombre *</Form.Label>
             <Form.Control
               type="text"
-              name="nombre_cliente"
-              value={clienteEditar.nombre_cliente}
+              name="nombre"
+              value={clienteEditar.nombre}
               onChange={manejoCambioInputEdicion}
             />
           </Form.Group>
@@ -44,8 +44,8 @@ const ModalEdicionCliente = ({
             <Form.Label>Apellido</Form.Label>
             <Form.Control
               type="text"
-              name="apellido_cliente"
-              value={clienteEditar.apellido_cliente}
+              name="apellido"
+              value={clienteEditar.apellido}
               onChange={manejoCambioInputEdicion}
             />
           </Form.Group>
@@ -68,7 +68,7 @@ const ModalEdicionCliente = ({
         <Button
           variant="primary"
           onClick={handleActualizar}
-          disabled={!clienteEditar.nombre_cliente?.trim() || !clienteEditar.celular?.trim() || deshabilitado}
+          disabled={!clienteEditar.nombre?.trim() || !clienteEditar.celular?.trim() || deshabilitado}
         >
           Actualizar Cliente
         </Button>

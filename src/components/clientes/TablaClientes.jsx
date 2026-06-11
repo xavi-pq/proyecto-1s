@@ -35,8 +35,8 @@ const TablaClientes = ({
             {clientes.map((cliente) => (
               <tr key={cliente.id_cliente}>
                 <td>{cliente.id_cliente}</td>
-                <td>{cliente.nombre_cliente}</td>
-                <td>{cliente.apellido_cliente || "—"}</td>
+                <td>{cliente.nombre}</td>
+                <td>{cliente.apellido || "—"}</td>
                 <td>{cliente.celular}</td>
                 <td className="text-center">
                   <Button

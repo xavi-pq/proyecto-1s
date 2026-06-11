@@ -30,7 +30,7 @@ const ModalEliminacionCliente = ({
       <Modal.Body>
         ¿Estás seguro de que deseas eliminar al cliente{" "}
         <strong>
-          {cliente?.nombre_cliente} {cliente?.apellido_cliente}
+          {cliente?.nombre} {cliente?.apellido}
         </strong>
         ?
       </Modal.Body>

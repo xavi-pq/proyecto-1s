@@ -10,7 +10,7 @@ const TablaVentas = ({ ventas, abrirEdicion, handlePrint }) => {
           <th>Fecha</th>
           <th>Cliente</th>
           <th>Empleado</th>
-          <th>Pago</th>
+          <th>Estado</th>
           <th className="text-end">Total</th>
           <th className="text-center">Acciones</th>
         </tr>
@@ -19,15 +19,15 @@ const TablaVentas = ({ ventas, abrirEdicion, handlePrint }) => {
         {ventas.map((venta) => (
           <tr key={venta.id_venta}>
             <td>#{venta.id_venta}</td>
-            <td>{new Date(venta.fecha_venta).toLocaleString('es-NI')}</td>
-            <td>
-              {venta.clientes?.nombre_cliente} {venta.clientes?.apellido_cliente}
-            </td>
+            <td>{venta.fecha_venta ? new Date(venta.fecha_venta).toLocaleString('es-NI') : '-'}</td>
+            <td>{venta.clientes?.nombre} {venta.clientes?.apellido}</td>
             <td>
               {venta.empleados?.nombre_empleado} {venta.empleados?.apellido_empleado}
             </td>
             <td>
-              <span className="badge bg-info">{venta.metodo_pago}</span>
+              <span className={`badge ${venta.estado ? 'bg-success' : 'bg-danger'}`}>
+                {venta.estado ? 'Activo' : 'Anulado'}
+              </span>
             </td>
             <td className="text-end fw-bold">C$ {parseFloat(venta.total || 0).toFixed(2)}</td>
             <td className="text-center">
