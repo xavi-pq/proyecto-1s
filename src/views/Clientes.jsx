@@ -195,7 +195,7 @@ const Clientes = () => {
         mensaje: `Cliente eliminado exitosamente.`,
         tipo: "exito",
       });
-    } catch (err) {
+    } catch (_err) {
       setToast({
         mostrar: true,
         mensaje: "Error inesperado al eliminar cliente.",
@@ -240,7 +240,7 @@ const Clientes = () => {
         mensaje: `Cliente actualizado exitosamente.`,
         tipo: "exito",
       });
-    } catch (err) {
+    } catch (_err) {
       setToast({
         mostrar: true,
         mensaje: "Error inesperado al actualizar cliente.",

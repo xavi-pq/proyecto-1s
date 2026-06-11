@@ -16,10 +16,10 @@ const ChatIA = ({ mostrar, onCerrar }) => {
   Tablas disponibles:
   - categorias (id_categoria, nombre_categoria, descripcion_categoria)
   - clientes (id_cliente, nombre, apellido, celular)
-  - productos (id_producto, nombre_producto, descripcion_producto, categoria_producto, precio_venta, url_imagen)
+  - productos (id_producto, nombre, descripcion_producto, categoria_id, precio, stock, fecha_creacion, imagen_url)
   - ventas (id_venta, id_cliente, id_empleado, fecha_venta, metodo_pago, total)
   - detalles_ventas (id_detalle, id_venta, id_producto, cantidad, precio_unitario, subtotal)
-  - empleados (id_empleado, nombre_empleado, apellido_empleado, email, celular, tipo_empleado)
+  - empleados (id_empleado, nombre_empleado, apellido_empleado, email, celular, pin, tipo_empleado)
   `;
 
   const enviarConsulta = async () => {

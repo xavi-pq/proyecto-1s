@@ -38,22 +38,33 @@ const Inicio = () => {
       const finRango = `${hasta} 23:59:59`;
 
       const { data: pedidos, error } = await supabase
-        .from("pedidos")
-        .select("id_pedido, total, fecha")
-        .gte("fecha", inicioRango)
-        .lte("fecha", finRango);
+        .from("ventas")
+        .select("id_venta, total, fecha_venta, metodo_pago")
+        .gte("fecha_venta", inicioRango)
+        .lte("fecha_venta", finRango);
 
       if (error) throw error;
 
-      const idsPedidos = pedidos?.map(p => p.id_pedido) || [];
+      const idsPedidos = pedidos?.map(p => p.id_venta) || [];
 
       let productosVendidos = 0;
       let montoProductos = 0;
       let ventasPorCategoria = [];
+      let ventasEfectivo = 0;
+      let ventasTarjeta = 0;
+
+      // Calculate cash and card totals
+      pedidos?.forEach(p => {
+        if (p.metodo_pago === "efectivo") {
+          ventasEfectivo += p.total || 0;
+        } else if (p.metodo_pago === "tarjeta") {
+          ventasTarjeta += p.total || 0;
+        }
+      });
 
       if (idsPedidos.length > 0) {
         const { data: detalles } = await supabase
-          .from("detalle_pedido")
+          .from("detalles_ventas")
           .select(`
             cantidad, 
             subtotal,
@@ -62,7 +73,7 @@ const Inicio = () => {
               categorias (nombre_categoria)
             )
           `)
-          .in("pedido_id", idsPedidos);
+          .in("id_venta", idsPedidos);
 
         detalles?.forEach(d => {
           productosVendidos += d.cantidad || 0;
@@ -85,8 +96,8 @@ const Inicio = () => {
 
       const horaMap = Array(24).fill(0);
       pedidos?.forEach(pedido => {
-        if (!pedido.fecha) return;
-        const hora = new Date(pedido.fecha).getHours();
+        if (!pedido.fecha_venta) return;
+        const hora = new Date(pedido.fecha_venta).getHours();
         if (hora >= 0 && hora < 24) horaMap[hora] += pedido.total || 0;
       });
 
@@ -102,8 +113,8 @@ const Inicio = () => {
 
       setEstadisticas({
         totalVentas,
-        ventasEfectivo: 0,
-        ventasTarjeta: 0,
+        ventasEfectivo,
+        ventasTarjeta,
         productosVendidos,
         montoProductos,
         cantidadVentas: pedidos?.length || 0,
@@ -293,31 +304,31 @@ const Inicio = () => {
       const finRango = `${fechaHasta} 23:59:59`;
 
       const { data: pedidos, error: errorPedidos } = await supabase
-        .from("pedidos")
-        .select(`id_pedido, fecha, total, estado, id_empleado, cliente_id`)
-        .gte("fecha", inicioRango)
-        .lte("fecha", finRango)
-        .order("fecha", { ascending: false });
+        .from("ventas")
+        .select(`id_venta, fecha_venta, total, id_empleado, id_cliente, metodo_pago`)
+        .gte("fecha_venta", inicioRango)
+        .lte("fecha_venta", finRango)
+        .order("fecha_venta", { ascending: false });
 
       if (errorPedidos) throw errorPedidos;
 
-      const idsPedidos = pedidos?.map(p => p.id_pedido) || [];
+      const idsPedidos = pedidos?.map(p => p.id_venta) || [];
       let detallesVenta = [];
 
       if (idsPedidos.length > 0) {
-        const { data: detalles, error: errorDetalles } = await supabase
-          .from("detalle_pedido")
+          const { data: detalles, error: errorDetalles } = await supabase
+          .from("detalles_ventas")
           .select(`
-            id_detalle_pedido,
-            pedido_id,
+            id_detalle,
+            id_venta,
+            id_producto,
             cantidad,
             precio_unitario,
             subtotal,
-            producto_id,
             productos (nombre, categorias (nombre_categoria))
           `)
-          .in("pedido_id", idsPedidos)
-          .order("pedido_id");
+          .in("id_venta", idsPedidos)
+          .order("id_venta");
 
         if (errorDetalles) console.error("Error en detalles:", errorDetalles);
         else detallesVenta = detalles || [];
@@ -327,19 +338,19 @@ const Inicio = () => {
 
       if (pedidos && pedidos.length > 0) {
         const wsVentas = XLSX.utils.json_to_sheet(pedidos);
-        XLSX.utils.book_append_sheet(wb, wsVentas, "Pedidos");
+        XLSX.utils.book_append_sheet(wb, wsVentas, "Ventas");
       } else {
-        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet([{ Mensaje: "No hay pedidos en este rango" }]), "Pedidos");
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet([{ Mensaje: "No hay ventas en este rango" }]), "Ventas");
       }
 
       if (detallesVenta && detallesVenta.length > 0) {
         const wsDetalles = XLSX.utils.json_to_sheet(detallesVenta);
-        XLSX.utils.book_append_sheet(wb, wsDetalles, "Detalles_Pedidos");
+        XLSX.utils.book_append_sheet(wb, wsDetalles, "Detalles_Ventas");
       } else {
-        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet([{ Mensaje: "No hay detalles" }]), "Detalles_Pedidos");
+        XLSX.utils.book_append_sheet(wb, XLSX.utils.json_to_sheet([{ Mensaje: "No hay detalles" }]), "Detalles_Ventas");
       }
 
-      XLSX.writeFile(wb, `Reporte_Pedidos_${fechaDesde}_a_${fechaHasta}.xlsx`);
+      XLSX.writeFile(wb, `Reporte_Ventas_${fechaDesde}_a_${fechaHasta}.xlsx`);
 
     } catch (err) {
       console.error("Error generando Excel:", err);

@@ -60,7 +60,7 @@ const Ventas = () => {
           *,
           clientes (nombre, apellido),
           empleados (nombre_empleado, apellido_empleado),
-          detalle_ventas (*, productos (nombre, precio))
+          detalles_ventas (*, productos (nombre, precio))
         `)
         .order("fecha_venta", { ascending: false });
 
@@ -190,7 +190,7 @@ const Ventas = () => {
           metodo_pago: metodoPago
         }).eq("id_venta", ventaAEditar.id_venta);
 
-        await supabase.from("detalle_ventas").delete().eq("id_venta", ventaAEditar.id_venta);
+        await supabase.from("detalles_ventas").delete().eq("id_venta", ventaAEditar.id_venta);
 
         const detallesInsert = detalles.map(d => ({
           id_venta: ventaAEditar.id_venta,
@@ -200,7 +200,7 @@ const Ventas = () => {
           subtotal: d.cantidad * d.precio
         }));
 
-        await supabase.from("detalle_ventas").insert(detallesInsert);
+        await supabase.from("detalles_ventas").insert(detallesInsert);
 
         setToast({ mostrar: true, mensaje: "Venta actualizada exitosamente", tipo: "exito" });
       } else {
@@ -214,7 +214,6 @@ const Ventas = () => {
             id_empleado: empleadoSeleccionado.id_empleado,
             fecha_venta: nicaNow(),
             metodo_pago: metodoPago,
-            estado: true,
             total: totalGeneral
           }])
           .select()
@@ -230,7 +229,7 @@ const Ventas = () => {
           subtotal: d.cantidad * d.precio
         }));
 
-        const { error: detalleError } = await supabase.from("detalle_ventas").insert(detallesInsert);
+        const { error: detalleError } = await supabase.from("detalles_ventas").insert(detallesInsert);
         if (detalleError) throw detalleError;
 
         setToast({ mostrar: true, mensaje: "Venta registrada exitosamente", tipo: "exito" });
@@ -261,7 +260,7 @@ const Ventas = () => {
       })
       : "-";
 
-    const detalle = venta.detalle_pedido || [];
+    const detalle = venta.detalles_ventas || [];
 
     let detalleTexto = "DETALLES DE VENTA:\n Cant.  Pre.  Sub.\n--------------------------------\n";
 
@@ -279,7 +278,7 @@ const Ventas = () => {
 
     const total = `C$${Number(venta.total).toFixed(2)}`;
     const iva = venta.total * 0.10;
-    const numeroVenta = venta.id_pedido || "-";
+    const numeroVenta = venta.id_venta || "-";
 
     const texto = `
 DISCOSA - Ticket #${numeroVenta}
@@ -290,7 +289,6 @@ Fecha: ${fecha}
 ${detalleTexto}
 IVA: C$${iva.toFixed(2)}
 TOTAL: ${total}
-Estado: ${venta.estado ? "Activo" : "Anulado"}
 ================================
 Gracias por su compra!
 `;

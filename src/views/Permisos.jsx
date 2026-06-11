@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { Container, Row, Col, Button, Spinner, Alert } from "react-bootstrap";
+import { Container, Row, Col, Spinner } from "react-bootstrap";
 import { supabase } from "../database/supabaseconfig";
 import NotificacionOperacion from "../components/NotificacionOperacion";
 import CuadroBusquedas from "../components/busquedas/CuadroBusquedas";
@@ -77,7 +77,7 @@ const Permisos = () => {
         mensaje: `Permisos de ${rolEditar.rol} actualizados correctamente`,
         tipo: "exito"
       });
-    } catch (err) {
+    } catch (_err) {
       setToast({ mostrar: true, mensaje: "Error al actualizar permisos", tipo: "error" });
     }
   };

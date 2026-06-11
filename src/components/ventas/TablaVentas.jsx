@@ -10,7 +10,6 @@ const TablaVentas = ({ ventas, abrirEdicion, handlePrint }) => {
           <th>Fecha</th>
           <th>Cliente</th>
           <th>Empleado</th>
-          <th>Estado</th>
           <th className="text-end">Total</th>
           <th className="text-center">Acciones</th>
         </tr>
@@ -23,11 +22,6 @@ const TablaVentas = ({ ventas, abrirEdicion, handlePrint }) => {
             <td>{venta.clientes?.nombre} {venta.clientes?.apellido}</td>
             <td>
               {venta.empleados?.nombre_empleado} {venta.empleados?.apellido_empleado}
-            </td>
-            <td>
-              <span className={`badge ${venta.estado ? 'bg-success' : 'bg-danger'}`}>
-                {venta.estado ? 'Activo' : 'Anulado'}
-              </span>
             </td>
             <td className="text-end fw-bold">C$ {parseFloat(venta.total || 0).toFixed(2)}</td>
             <td className="text-center">
