@@ -32,7 +32,7 @@ const ChatIA = ({ mostrar, onCerrar }) => {
     setCargando(true);
 
     try {
-      const modelo = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
+      const modelo = genAI.getGenerativeModel({ model: "gemini-1.5-flash" });
 
       const prompt = `
       Eres un experto en PostgreSQL. Genera una consulta SQL válida.

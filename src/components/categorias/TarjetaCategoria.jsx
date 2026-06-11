@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useCallback } from "react";
+import React, { useState, useCallback } from "react";
 import { Card, Row, Col, Spinner, Button } from "react-bootstrap";
 import "bootstrap-icons/font/bootstrap-icons.css";
 
@@ -9,12 +9,9 @@ const TarjetaCategoria = ({
   generarPDFCategoria,
   copiarCategoria,
 }) => {
-  const [cargando, setCargando] = useState(true);
   const [idTarjetaActiva, setIdTarjetaActiva] = useState(null);
 
-  useEffect(() => {
-    setCargando(!(categorias && categorias.length > 0));
-  }, [categorias]);
+  const cargando = !(categorias && categorias.length > 0);
 
   const manejarTeclaEscape = useCallback((evento) => {
     if (evento.key === "Escape") setIdTarjetaActiva(null);
