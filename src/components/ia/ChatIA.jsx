@@ -15,11 +15,11 @@ const ChatIA = ({ mostrar, onCerrar }) => {
   Sistema de ventas. 
   Tablas disponibles:
   - categorias (id_categoria, nombre_categoria, descripcion_categoria)
-  - clientes (id_cliente, nombre, apellido, celular)
-  - productos (id_producto, nombre, descripcion_producto, categoria_id, precio, stock, fecha_creacion, imagen_url)
+  - clientes (id_cliente, nombre_cliente, apellido_cliente, celular)
+  - productos (id_producto, nombre_producto, descripcion_producto, categoria_producto, precio_venta, url_imagen)
   - ventas (id_venta, id_cliente, id_empleado, fecha_venta, metodo_pago, total)
   - detalles_ventas (id_detalle, id_venta, id_producto, cantidad, precio_unitario, subtotal)
-  - empleados (id_empleado, nombre_empleado, apellido_empleado, email, celular, pin, tipo_empleado)
+  - empleados (id_empleado, nombre_empleado, apellido_empleado, email, celular, tipo_empleado)
   `;
 
   const enviarConsulta = async () => {
@@ -32,7 +32,7 @@ const ChatIA = ({ mostrar, onCerrar }) => {
     setCargando(true);
 
     try {
-      const modelo = genAI.getGenerativeModel({ model: "gemini-2.0-flash" });
+      const modelo = genAI.getGenerativeModel({ model: "gemini-2.5-flash" });
 
       const prompt = `
       Eres un experto en PostgreSQL. Genera una consulta SQL válida.

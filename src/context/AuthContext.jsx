@@ -1,7 +1,6 @@
-import { createContext, useContext, useState, useEffect } from 'react';
+import { useState, useEffect } from 'react';
 import { supabase } from '../database/supabaseconfig';
-
-const AuthContext = createContext();
+import { AuthContext } from './AuthContextOnly';
 
 export const AuthProvider = ({ children }) => {
   const [usuario, setUsuario] = useState(null);
@@ -17,7 +16,7 @@ export const AuthProvider = ({ children }) => {
       .eq('rol', rol)
       .single();
 
-      console.log("Permisos cargados para rol:", rol, data);
+    console.log("Permisos cargados para rol:", rol, data);
 
     if (error) {
       console.error("Error al cargar permisos:", error);
@@ -115,12 +114,4 @@ export const AuthProvider = ({ children }) => {
       {children}
     </AuthContext.Provider>
   );
-};
-
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth debe usarse dentro de un AuthProvider');
-  }
-  return context;
 };
