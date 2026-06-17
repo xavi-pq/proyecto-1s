@@ -81,7 +81,10 @@ const FormularioLogin = ({
           </Alert>
         )}
 
-        <Form>
+        <Form onSubmit={(e) => {
+          e.preventDefault();
+          iniciarSesion();
+        }}>
           <Form.Group className="mb-4" controlId="usuario">
             <Form.Label 
               className="fw-semibold mb-2"
@@ -147,8 +150,8 @@ const FormularioLogin = ({
           </Form.Group>
 
           <Button 
+            type="submit"
             className="w-100 py-3 shadow" 
-            onClick={iniciarSesion}
             disabled={cargando}
             style={{
               background: "linear-gradient(135deg, #FF69B4, #FF1493)",

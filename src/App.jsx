@@ -1,4 +1,4 @@
-import { BrowserRouter as Router, Routes, Route } from "react-router-dom";
+import { BrowserRouter as Router, Routes, Route, useLocation } from "react-router-dom";
 
 import Encabezado from "./components/navegacion/Encabezado";
 
@@ -17,10 +17,13 @@ import Pagina404 from "./views/Pagina404";
 
 import "./App.css";
 
-const App = () => {
+const AppContent = () => {
+  const location = useLocation();
+  const esLogin = location.pathname === "/login";
+  
   return (
-    <Router>
-      <Encabezado />
+    <>
+      {!esLogin && <Encabezado />}
       <div className="animate-fade-in">
         <Routes>
           <Route path="/login" element={<Login />} />
@@ -36,6 +39,14 @@ const App = () => {
           <Route path="*" element={<RutaProtegida><Pagina404 /></RutaProtegida>} />
         </Routes>
       </div>
+    </>
+  );
+};
+
+const App = () => {
+  return (
+    <Router>
+      <AppContent />
     </Router>
   );
 };
