@@ -1,6 +1,6 @@
 import React, { useState } from "react";
 import { useNavigate, useLocation } from "react-router-dom";
-import { Container, Nav, Navbar, Button } from "react-bootstrap";
+import { Container, Nav, Navbar, Button, Badge } from "react-bootstrap";
 import { useAuth } from "../../context/AuthContext";
 import ChatIA from "../ia/ChatIA";
 
@@ -32,27 +32,37 @@ const Encabezado = () => {
       <Navbar 
         expand="lg" 
         fixed="top" 
-        className="color-navbar py-2"
+        className="py-3"
       >
-      <Container>
+      <Container fluid className="px-3 px-lg-4">
         <Navbar.Brand 
           onClick={() => navigate("/")} 
           className="d-flex align-items-center cursor-pointer me-4"
           style={{ cursor: 'pointer' }}
         >
-          <div className="bg-primary rounded-circle p-2 me-2 d-flex align-items-center justify-content-center shadow-sm" style={{ width: '40px', height: '40px' }}>
-            <i className="bi-box-seam text-white h5 mb-0"></i>
+          <div 
+            className="rounded-circle p-2 me-2 d-flex align-items-center justify-content-center shadow"
+            style={{ 
+              width: '48px', 
+              height: '48px', 
+              background: 'linear-gradient(135deg, #FF69B4, #FF1493)'
+            }}
+          >
+            <i className="bi bi-shop text-white fs-4 mb-0"></i>
           </div>
-          <span className="fw-bold fs-4 tracking-tighter">Discosa</span>
+          <span className="fw-bold fs-4" style={{ color: '#880E4F' }}>
+            DISCOSA
+          </span>
         </Navbar.Brand>
 
         <div className="d-flex align-items-center gap-2 ms-auto d-lg-none">
           <Navbar.Toggle 
             aria-controls="basic-navbar-nav" 
             onClick={manejarToggle}
-            className="border-0 shadow-none p-0"
+            className="border-0 shadow-none p-2"
+            style={{ borderRadius: '12px' }}
           >
-            <i className={`bi ${mostrarMenu ? 'bi-x-lg' : 'bi-list'} h3 mb-0 text-primary`}></i>
+            <i className={`bi ${mostrarMenu ? 'bi-x-lg' : 'bi-list'} fs-2 text-dark`} style={{ color: '#AD1457' }}></i>
           </Navbar.Toggle>
         </div>
 
@@ -64,7 +74,7 @@ const Encabezado = () => {
                 onClick={() => manejarNavegacion("/login")} 
                 className={`nav-link-custom ${location.pathname === '/login' ? 'nav-link-active' : ''}`}
               >
-                <i className="bi-person-fill-lock me-2"></i> Iniciar sesión
+                <i className="bi bi-person-fill-lock me-2"></i> Iniciar sesión
               </Nav.Link>
             ) : !estaLogueado ? (
               <>
@@ -72,13 +82,13 @@ const Encabezado = () => {
                   onClick={() => manejarNavegacion("/catalogo")} 
                   className={`nav-link-custom ${location.pathname === '/catalogo' ? 'nav-link-active' : ''}`}
                 >
-                  <i className="bi-layout-text-window-reverse me-2"></i> Catálogo
+                  <i className="bi bi-layout-text-window-reverse me-2"></i> Catálogo
                 </Nav.Link>
                 <Nav.Link 
                   onClick={() => manejarNavegacion("/login")} 
                   className={`nav-link-custom ${location.pathname === '/login' ? 'nav-link-active' : ''}`}
                 >
-                  <i className="bi-person-circle me-2"></i> Acceso Admin
+                  <i className="bi bi-person-circle me-2"></i> Acceso Admin
                 </Nav.Link>
               </>
             ) : (
@@ -89,13 +99,13 @@ const Encabezado = () => {
                       onClick={() => manejarNavegacion("/")} 
                       className={`nav-link-custom ${location.pathname === '/' ? 'nav-link-active' : ''}`}
                     >
-                      <i className="bi-house-fill me-2"></i> Inicio
+                      <i className="bi bi-house-fill me-2"></i> Inicio
                     </Nav.Link>
                     <Nav.Link 
                       onClick={() => manejarNavegacion("/dashboard")} 
                       className={`nav-link-custom ${location.pathname === '/dashboard' ? 'nav-link-active' : ''}`}
                     >
-                      <i className="bi-bar-chart-fill me-2"></i> Dashboard
+                      <i className="bi bi-bar-chart-fill me-2"></i> Dashboard
                     </Nav.Link>
                   </>
                 )}
@@ -104,7 +114,7 @@ const Encabezado = () => {
                     onClick={() => manejarNavegacion("/categorias")} 
                     className={`nav-link-custom ${location.pathname === '/categorias' ? 'nav-link-active' : ''}`}
                   >
-                    <i className="bi-grid-fill me-2"></i> Categorías
+                    <i className="bi bi-grid-fill me-2"></i> Categorías
                   </Nav.Link>
                 )}
                 {tienePermiso('ver_productos') && (
@@ -112,7 +122,7 @@ const Encabezado = () => {
                     onClick={() => manejarNavegacion("/productos")} 
                     className={`nav-link-custom ${location.pathname === '/productos' ? 'nav-link-active' : ''}`}
                   >
-                    <i className="bi-box-seam-fill me-2"></i> Productos
+                    <i className="bi bi-box-seam-fill me-2"></i> Productos
                   </Nav.Link>
                 )}
                 {tienePermiso('ver_empleados') && (
@@ -120,7 +130,7 @@ const Encabezado = () => {
                     onClick={() => manejarNavegacion("/empleados")} 
                     className={`nav-link-custom ${location.pathname === '/empleados' ? 'nav-link-active' : ''}`}
                   >
-                    <i className="bi-people-fill me-2"></i> Empleados
+                    <i className="bi bi-people-fill me-2"></i> Empleados
                   </Nav.Link>
                 )}
                 {tienePermiso('ver_clientes') && (
@@ -128,7 +138,7 @@ const Encabezado = () => {
                     onClick={() => manejarNavegacion("/clientes")} 
                     className={`nav-link-custom ${location.pathname === '/clientes' ? 'nav-link-active' : ''}`}
                   >
-                    <i className="bi-person-lines-fill me-2"></i> Clientes
+                    <i className="bi bi-person-lines-fill me-2"></i> Clientes
                   </Nav.Link>
                 )}
                 {tienePermiso('ver_ventas') && (
@@ -136,7 +146,7 @@ const Encabezado = () => {
                     onClick={() => manejarNavegacion("/ventas")} 
                     className={`nav-link-custom ${location.pathname === '/ventas' ? 'nav-link-active' : ''}`}
                   >
-                    <i className="bi-receipt-cutoff me-2"></i> Ventas
+                    <i className="bi bi-receipt-cutoff me-2"></i> Ventas
                   </Nav.Link>
                 )}
                 {tienePermiso('ver_permisos') && (
@@ -144,7 +154,7 @@ const Encabezado = () => {
                     onClick={() => manejarNavegacion("/permisos")} 
                     className={`nav-link-custom ${location.pathname === '/permisos' ? 'nav-link-active' : ''}`}
                   >
-                    <i className="bi-shield-lock-fill me-2"></i> Permisos
+                    <i className="bi bi-shield-lock-fill me-2"></i> Permisos
                   </Nav.Link>
                 )}
                 {tienePermiso('ver_catalogo') && (
@@ -152,24 +162,33 @@ const Encabezado = () => {
                     onClick={() => manejarNavegacion("/catalogo")} 
                     className={`nav-link-custom ${location.pathname === '/catalogo' ? 'nav-link-active' : ''}`}
                   >
-                    <i className="bi-layout-text-window-reverse me-2"></i> Catálogo
+                    <i className="bi bi-layout-text-window-reverse me-2"></i> Catálogo
                   </Nav.Link>
                 )}
                 {estaLogueado && (
                   <Nav.Link 
                     onClick={() => setMostrarChatIA(true)} 
-                    className="nav-link-custom text-primary"
+                    className="nav-link-custom"
+                    style={{ color: '#FF1493' }}
                   >
-                    <i className="bi bi-robot me-2"></i> Asistente IA
+                    <Badge bg="light" text="dark" className="me-2" style={{ background: 'linear-gradient(135deg, #FFD1DC, #FFB6C1)', color: '#AD1457' }}>
+                      <i className="bi bi-robot me-1"></i>IA
+                    </Badge>
                   </Nav.Link>
                 )}
                 <div className="ms-lg-3 mt-3 mt-lg-0 w-100 w-lg-auto">
                   <Button 
-                    variant="primary" 
                     onClick={cerrarSesion}
-                    className="btn-rounded w-100 shadow-sm d-flex align-items-center justify-content-center gap-2"
+                    className="w-100 d-flex align-items-center justify-content-center gap-2"
+                    style={{ 
+                      background: 'linear-gradient(135deg, #FFB6C1, #FF69B4)',
+                      border: 'none',
+                      borderRadius: '15px',
+                      color: '#880E4F',
+                      fontWeight: 600
+                    }}
                   >
-                    <i className="bi-box-arrow-right"></i> Salir
+                    <i className="bi bi-box-arrow-right"></i> Salir
                   </Button>
                 </div>
               </>

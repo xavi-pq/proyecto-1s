@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useState, useEffect } from 'react';
+import { createContext, useContext, useState, useEffect } from 'react';
 import { supabase } from '../database/supabaseconfig';
 
 const AuthContext = createContext();
@@ -24,7 +24,9 @@ export const AuthProvider = ({ children }) => {
       return;
     }
 
-    setPermisos(data?.permisos || {});
+    // Parse the permissions if they're a string (common in Supabase JSON columns)
+    const permisosData = data?.permisos;
+    setPermisos(typeof permisosData === 'string' ? JSON.parse(permisosData) : permisosData || {});
   };
 
   const login = async (email, password) => {

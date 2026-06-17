@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import { useEffect, useState } from "react";
 import { Container, Row, Col, Spinner } from "react-bootstrap";
 import { supabase } from "../database/supabaseconfig";
 import NotificacionOperacion from "../components/NotificacionOperacion";
@@ -26,8 +26,13 @@ const Permisos = () => {
 
       if (error) throw error;
 
-      setRoles(data || []);
-      setRolesFiltrados(data || []);
+      // Parse permissions for each role if they're strings
+      const parsedRoles = (data || []).map(role => ({
+        ...role,
+        permisos: typeof role.permisos === 'string' ? JSON.parse(role.permisos) : role.permisos || {}
+      }));
+      setRoles(parsedRoles);
+      setRolesFiltrados(parsedRoles);
     } catch (err) {
       setToast({ mostrar: true, mensaje: "Error al cargar permisos", tipo: "error" });
       console.error(err);
@@ -77,7 +82,7 @@ const Permisos = () => {
         mensaje: `Permisos de ${rolEditar.rol} actualizados correctamente`,
         tipo: "exito"
       });
-    } catch (_err) {
+    } catch {
       setToast({ mostrar: true, mensaje: "Error al actualizar permisos", tipo: "error" });
     }
   };

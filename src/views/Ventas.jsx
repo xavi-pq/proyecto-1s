@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { Container, Row, Col, Button, Spinner } from "react-bootstrap";
 import { supabase } from "../database/supabaseconfig";
+import { jsPDF } from "jspdf";
+import autoTable from "jspdf-autotable";
 import NotificacionOperacion from "../components/NotificacionOperacion";
 import CuadroBusquedas from "../components/busquedas/CuadroBusquedas";
 import Paginacion from "../components/ordenamiento/Paginacion";
@@ -249,11 +251,10 @@ const Ventas = () => {
 
   const handlePrint = (venta) => {
     const nombreMostrar = `${venta.clientes?.nombre || ""} ${venta.clientes?.apellido || ""}`.trim() || "Cliente Genérico";
-
     const fecha = venta.fecha_venta
-      ? new Date(venta.fecha).toLocaleString("es-NI", {
-        year: "2-digit",
-        month: "2-digit",
+      ? new Date(venta.fecha_venta).toLocaleString("es-NI", {
+        year: "numeric",
+        month: "long",
         day: "2-digit",
         hour: "2-digit",
         minute: "2-digit",
@@ -261,40 +262,85 @@ const Ventas = () => {
       : "-";
 
     const detalle = venta.detalles_ventas || [];
+    const total = Number(venta.total);
+    const iva = total * 0.10;
+    const subtotal = total - iva;
+    const numeroVenta = venta.id_venta || "-";
+    const empleado = `${venta.empleados?.nombre_empleado || ""} ${venta.empleados?.apellido_empleado || ""}`.trim() || "-";
+    const metodoPago = venta.metodo_pago || "-";
 
-    let detalleTexto = "DETALLES DE VENTA:\n Cant.  Pre.  Sub.\n--------------------------------\n";
-
-    detalle.forEach((item) => {
-      const nombreProducto = item.productos?.nombre || "Producto";
-      detalleTexto += `${nombreProducto}\n`;
-      detalleTexto += `   ${item.cantidad}  C$${Number(item.precio_unitario).toFixed(2)}  C$${Number(item.subtotal).toFixed(2)}\n`;
+    // Create PDF
+    const doc = new jsPDF({
+      unit: 'mm',
+      format: 'letter'
     });
 
-    detalleTexto += "--------------------------------";
+    // Header
+    doc.setFontSize(24);
+    doc.setFont('helvetica', 'bold');
+    doc.text('DISCOSA', 105, 20, { align: 'center' });
+    doc.setFontSize(12);
+    doc.setFont('helvetica', 'normal');
+    doc.text('Factura de Venta', 105, 28, { align: 'center' });
+    
+    // Line separator
+    doc.setLineWidth(0.5);
+    doc.line(20, 33, 195, 33);
 
-    if (detalle.length === 0) {
-      detalleTexto += "\nNO HAY DETALLE\n--------------------------------";
-    }
+    // Invoice info
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`Factura #: ${numeroVenta}`, 20, 42);
+    doc.text(`Fecha: ${fecha}`, 120, 42);
+    doc.text(`Cliente: ${nombreMostrar}`, 20, 50);
+    doc.text(`Atendido por: ${empleado}`, 120, 50);
+    doc.text(`Método de Pago: ${metodoPago}`, 20, 58);
 
-    const total = `C$${Number(venta.total).toFixed(2)}`;
-    const iva = venta.total * 0.10;
-    const numeroVenta = venta.id_venta || "-";
+    // Line separator
+    doc.line(20, 63, 195, 63);
 
-    const texto = `
-DISCOSA - Ticket #${numeroVenta}
-================================
-Cliente: ${nombreMostrar}
-Fecha: ${fecha}
-================================
-${detalleTexto}
-IVA: C$${iva.toFixed(2)}
-TOTAL: ${total}
-================================
-Gracias por su compra!
-`;
+    // Table
+    const tableData = detalle.map(item => [
+      item.productos?.nombre || 'Producto',
+      item.cantidad,
+      `C$${Number(item.precio_unitario).toFixed(2)}`,
+      `C$${Number(item.subtotal).toFixed(2)}`
+    ]);
 
-    const encoded = encodeURIComponent(texto);
-    window.location.href = `rawbt:${encoded}`;
+    autoTable(doc, {
+      head: [['Producto', 'Cantidad', 'Precio Unitario', 'Subtotal']],
+      body: tableData,
+      startY: 70,
+      theme: 'striped',
+      headStyles: {
+        fillColor: '#ad1457',
+        textColor: 255,
+        fontSize: 10,
+        fontStyle: 'bold'
+      },
+      bodyStyles: {
+        fontSize: 10
+      },
+      margin: { left: 20, right: 20 }
+    });
+
+    // Totals
+    const finalY = (doc.lastAutoTable.finalY || 150) + 10;
+    doc.setFontSize(11);
+    doc.setFont('helvetica', 'bold');
+    doc.text(`Subtotal: C$${subtotal.toFixed(2)}`, 130, finalY);
+    doc.text(`IVA (10%): C$${iva.toFixed(2)}`, 130, finalY + 8);
+    doc.setFontSize(14);
+    doc.text(`TOTAL: C$${total.toFixed(2)}`, 130, finalY + 18);
+
+    // Footer
+    doc.setFontSize(10);
+    doc.setFont('helvetica', 'normal');
+    doc.text('¡Gracias por su compra!', 105, finalY + 35, { align: 'center' });
+    doc.text('DISCOSA - Todos los derechos reservados', 105, finalY + 42, { align: 'center' });
+
+    // Save PDF
+    doc.save(`factura-venta-${numeroVenta}.pdf`);
   };
 
   return (
